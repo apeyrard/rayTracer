@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/object.hpp
+vec3.hpp
+-
+ray.hpp
+-
+
+../include/ray.hpp
+vec3.hpp
+-
+
+../include/sphere.hpp
+object.hpp
+-
+vec3.hpp
+-
+ray.hpp
+-
+
+../include/vec3.hpp
+
+/home/alex/Work/rayTracer/tests/test_raytracer.cpp
+gtest/gtest.h
+-
+cmath
+-
+vec3.hpp
+-
+ray.hpp
+-
+sphere.hpp
+-
+

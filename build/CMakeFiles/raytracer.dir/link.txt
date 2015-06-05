@@ -1,0 +1,2 @@
+/usr/bin/ar cq libraytracer.a  CMakeFiles/raytracer.dir/src/vec3.cpp.o CMakeFiles/raytracer.dir/src/ray.cpp.o CMakeFiles/raytracer.dir/src/object.cpp.o CMakeFiles/raytracer.dir/src/sphere.cpp.o CMakeFiles/raytracer.dir/src/main.cpp.o
+/usr/bin/ranlib libraytracer.a
