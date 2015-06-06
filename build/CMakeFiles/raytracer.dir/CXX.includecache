@@ -39,6 +39,8 @@ SFML/Graphics.hpp
 -
 iostream
 -
+algorithm
+-
 
 /home/alex/Work/rayTracer/src/object.cpp
 object.hpp
@@ -52,6 +54,8 @@ ray.hpp
 sphere.hpp
 -
 cmath
+-
+iostream
 -
 
 /home/alex/Work/rayTracer/src/vec3.cpp

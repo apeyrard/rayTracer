@@ -1,6 +1,8 @@
 #include <sphere.hpp>
 #include <cmath>
 
+#include <iostream>
+
 namespace raytracer{
 
 Sphere::Sphere(Vec3 pos, double radius, Vec3 color, double reflection, double diffuse)

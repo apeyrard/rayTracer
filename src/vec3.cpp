@@ -105,5 +105,9 @@ Vec3 Vec3::cross(const Vec3& other) const
     return Vec3(y*other.z-z*other.y, z*other.x-x*other.z,x*other.y-y*other.x);
 }
 
+double Vec3::length() const
+{
+    return sqrt(pow(x, 2) + pow(y, 2) + pow(z,2));
+}
 
 }

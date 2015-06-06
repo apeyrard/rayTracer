@@ -25,6 +25,7 @@ public:
     Vec3 norm();
     double dot(const Vec3& other) const;
     Vec3 cross(const Vec3& other) const;
+    double length() const;
 };
 
 }

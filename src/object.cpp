@@ -10,4 +10,9 @@ Object::Object(Vec3 pos, Vec3 color, double reflection, double diffuse)
 {
 }
 
+Object::~Object()
+{
+
+}
+
 }
