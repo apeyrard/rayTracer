@@ -13,8 +13,8 @@
 using namespace raytracer;
 
 int MAXDEPTH = 10;
-int WIDTH = 800;
-int HEIGHT = 600;
+int WIDTH = 1500;
+int HEIGHT = 700;
 double SAMPLES = 4.0; // 16X supersampling
 double EPSILON = 1.0e-07;
 
@@ -25,7 +25,7 @@ void initModel(std::vector<Object*>* listObjects)
     Sphere* sy = new Sphere(Vec3(0, 10, 0), 5, Vec3(0, 0, 255 ), 0, 0.8);
     Sphere* sz = new Sphere(Vec3(0, 0, 10), 5, Vec3(0, 255, 255 ), 0, 0.8);
 
-    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0,255 ,255 ), 0.8, 0.2, 0.5);
+    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0,255 ,255 ), 0.5, 0.2, 0.5);
     Sphere* s3 = new Sphere(Vec3(50, -50, 1), 50, Vec3(0,255 ,255 ), 0, 0.5, 0.5);
 
     Plane* sol = new Plane(Vec3(0, 1, 0).norm(), -200, Vec3(255, 255, 255), 0, 0.8);

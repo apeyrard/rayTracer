@@ -1,3 +1,0 @@
-/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir
-/home/alex/Work/rayTracer/build/CMakeFiles/rayTracer_test.dir
-/home/alex/Work/rayTracer/build/CMakeFiles/rayTracer.dir
