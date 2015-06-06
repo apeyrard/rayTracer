@@ -204,6 +204,33 @@ src/object.cpp.s:
 	$(MAKE) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/src/object.cpp.s
 .PHONY : src/object.cpp.s
 
+src/plane.o: src/plane.cpp.o
+.PHONY : src/plane.o
+
+# target to build an object file
+src/plane.cpp.o:
+	$(MAKE) -f CMakeFiles/rayTracer.dir/build.make CMakeFiles/rayTracer.dir/src/plane.cpp.o
+	$(MAKE) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/src/plane.cpp.o
+.PHONY : src/plane.cpp.o
+
+src/plane.i: src/plane.cpp.i
+.PHONY : src/plane.i
+
+# target to preprocess a source file
+src/plane.cpp.i:
+	$(MAKE) -f CMakeFiles/rayTracer.dir/build.make CMakeFiles/rayTracer.dir/src/plane.cpp.i
+	$(MAKE) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/src/plane.cpp.i
+.PHONY : src/plane.cpp.i
+
+src/plane.s: src/plane.cpp.s
+.PHONY : src/plane.s
+
+# target to generate assembly for a file
+src/plane.cpp.s:
+	$(MAKE) -f CMakeFiles/rayTracer.dir/build.make CMakeFiles/rayTracer.dir/src/plane.cpp.s
+	$(MAKE) -f CMakeFiles/raytracer.dir/build.make CMakeFiles/raytracer.dir/src/plane.cpp.s
+.PHONY : src/plane.cpp.s
+
 src/ray.o: src/ray.cpp.o
 .PHONY : src/ray.o
 
@@ -327,6 +354,9 @@ help:
 	@echo "... src/object.o"
 	@echo "... src/object.i"
 	@echo "... src/object.s"
+	@echo "... src/plane.o"
+	@echo "... src/plane.i"
+	@echo "... src/plane.s"
 	@echo "... src/ray.o"
 	@echo "... src/ray.i"
 	@echo "... src/ray.s"

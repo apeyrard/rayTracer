@@ -3,6 +3,7 @@
 
 CMakeFiles/rayTracer.dir/src/main.cpp.o
  ../include/object.hpp
+ ../include/plane.hpp
  ../include/ray.hpp
  ../include/sphere.hpp
  ../include/vec3.hpp
@@ -12,6 +13,12 @@ CMakeFiles/rayTracer.dir/src/object.cpp.o
  ../include/ray.hpp
  ../include/vec3.hpp
  /home/alex/Work/rayTracer/src/object.cpp
+CMakeFiles/rayTracer.dir/src/plane.cpp.o
+ ../include/object.hpp
+ ../include/plane.hpp
+ ../include/ray.hpp
+ ../include/vec3.hpp
+ /home/alex/Work/rayTracer/src/plane.cpp
 CMakeFiles/rayTracer.dir/src/ray.cpp.o
  ../include/ray.hpp
  ../include/vec3.hpp

@@ -2,6 +2,7 @@
 #include <vector>
 #include <object.hpp>
 #include <sphere.hpp>
+#include <plane.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <algorithm>
@@ -18,14 +19,34 @@ double EPSILON = 1.0e-07;
 
 void initModel(std::vector<Object*>* listObjects)
 {
-    Sphere* s = new Sphere(Vec3(0, 0, 1000), 300.0, Vec3(255, 0, 0), 0, 0.5);
-    Sphere* s2 = new Sphere(Vec3(0, 5, 30), 15.0, Vec3(0, 255, 0), 1 , 0);
-    Sphere* s4 = new Sphere(Vec3(-50, 5, 30), 15.0, Vec3(0, 255, 255), 0 , 1);
-    Sphere* s3 = new Sphere(Vec3(0, -100400, 0), 100000, Vec3(0, 255, 0), 0, 1);
+    Sphere* s = new Sphere(Vec3(0, 0, 0), 5, Vec3(255, 0, 0 ), 0, 0.8);
+    Sphere* sx = new Sphere(Vec3(10, 0, 0), 5, Vec3(0, 255, 0 ), 0, 0.8);
+    Sphere* sy = new Sphere(Vec3(0, 10, 0), 5, Vec3(0, 0, 255 ), 0, 0.8);
+    Sphere* sz = new Sphere(Vec3(0, 0, 10), 5, Vec3(0, 255, 255 ), 0, 0.8);
+
+    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0,255 ,255 ), 0.8, 0.2);
+    Sphere* s3 = new Sphere(Vec3(50, -50, 1), 50, Vec3(0,255 ,255 ), 0, 0.8);
+
+    Plane* sol = new Plane(Vec3(0, 1, 0).norm(), -200, Vec3(255, 255, 255), 0, 0.8);
+    Plane* plafond = new Plane(Vec3(0, 1, 0), 200, Vec3(255, 255, 50), 0, 0.8);
+    Plane* gauche = new Plane(Vec3(1, 0, 0).norm(), 200, Vec3(200, 50, 255), 0, 0.8);
+    Plane* droite = new Plane(Vec3(1, 0, 0).norm(), -200, Vec3(50, 250, 255), 0, 0.8);
+    Plane* derriere = new Plane(Vec3(0, 0, 1).norm(), 200, Vec3(50, 250, 255), 0.8, 0.2);
+    Plane* fond = new Plane(Vec3(0, 0, 1).norm(), -150, Vec3(50, 250, 55), 0, 0.8);
     listObjects->push_back(s);
+    listObjects->push_back(sx);
+    listObjects->push_back(sy);
+    listObjects->push_back(sz);
+
     listObjects->push_back(s2);
     listObjects->push_back(s3);
-    listObjects->push_back(s4);
+
+    listObjects->push_back(sol);
+    listObjects->push_back(plafond);
+    listObjects->push_back(gauche);
+    listObjects->push_back(droite);
+    listObjects->push_back(derriere);
+    listObjects->push_back(fond);
 }
 
 Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Vec3> lights)
@@ -115,25 +136,27 @@ int main()
 
     //lights, temp
     std::vector<Vec3> lights;
-    lights.push_back(Vec3(-800, -600, 10));
-    lights.push_back(Vec3(0, -50, 0));
+    //lights.push_back(Vec3(-800, -600, 10));
+    lights.push_back(Vec3(-100, 0, 1));
+    lights.push_back(Vec3(0, 0, -100));
 
 
-    for (int x = 0; x < HEIGHT; ++x)
+    for (int y = 0; y < HEIGHT; ++y)
     {
         //std::cout << x << std::endl;
-        for (int y = 0; y < WIDTH; ++y)
+        for (int x = 0; x < WIDTH; ++x)
         {
-            Vec3 origin = Vec3(0, 0, -10000);
-            Ray r = Ray(origin, Vec3(x-(HEIGHT/2), y-(WIDTH/2), -origin.z));
+            Vec3 finalColor = Vec3();
+            Vec3 origin = Vec3(0, 0, -150);
+            Ray r = Ray(origin, Vec3(x-(WIDTH/2), y-(HEIGHT/2), -origin.z));
             for (int i = 0; i < SAMPLES; ++i)
             {
                 finalColor = getColor(listObjects, r , lights);
             }
-            pixels[y*4 + x*WIDTH*4] = std::min(finalColor.x, 255.0); //TODO less naive clamp
-            pixels[y*4 + x*WIDTH*4 +1] = std::min(finalColor.y, 255.0);
-            pixels[y*4 + x*WIDTH*4 +2] = std::min(finalColor.z, 255.0);
-            pixels[y*4 + x*WIDTH*4 +3] = 255;
+            pixels[x*4 + y*WIDTH*4] = std::min(finalColor.x, 255.0); //TODO less naive clamp
+            pixels[x*4 + y*WIDTH*4 +1] = std::min(finalColor.y, 255.0);
+            pixels[x*4 + y*WIDTH*4 +2] = std::min(finalColor.z, 255.0);
+            pixels[x*4 + y*WIDTH*4 +3] = 255;
         }
         texture.update(pixels);
 

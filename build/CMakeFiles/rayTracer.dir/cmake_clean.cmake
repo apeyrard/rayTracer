@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/rayTracer.dir/src/ray.cpp.o"
   "CMakeFiles/rayTracer.dir/src/object.cpp.o"
   "CMakeFiles/rayTracer.dir/src/sphere.cpp.o"
+  "CMakeFiles/rayTracer.dir/src/plane.cpp.o"
   "CMakeFiles/rayTracer.dir/src/main.cpp.o"
   "../bin/debug/rayTracer.pdb"
   "../bin/debug/rayTracer"

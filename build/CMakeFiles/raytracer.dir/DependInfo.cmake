@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/alex/Work/rayTracer/src/main.cpp" "/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir/src/main.cpp.o"
   "/home/alex/Work/rayTracer/src/object.cpp" "/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir/src/object.cpp.o"
+  "/home/alex/Work/rayTracer/src/plane.cpp" "/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir/src/plane.cpp.o"
   "/home/alex/Work/rayTracer/src/ray.cpp" "/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir/src/ray.cpp.o"
   "/home/alex/Work/rayTracer/src/sphere.cpp" "/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir/src/sphere.cpp.o"
   "/home/alex/Work/rayTracer/src/vec3.cpp" "/home/alex/Work/rayTracer/build/CMakeFiles/raytracer.dir/src/vec3.cpp.o"

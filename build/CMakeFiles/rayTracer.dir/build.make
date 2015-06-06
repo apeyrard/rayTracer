@@ -141,9 +141,32 @@ CMakeFiles/rayTracer.dir/src/sphere.cpp.o.provides: CMakeFiles/rayTracer.dir/src
 
 CMakeFiles/rayTracer.dir/src/sphere.cpp.o.provides.build: CMakeFiles/rayTracer.dir/src/sphere.cpp.o
 
+CMakeFiles/rayTracer.dir/src/plane.cpp.o: CMakeFiles/rayTracer.dir/flags.make
+CMakeFiles/rayTracer.dir/src/plane.cpp.o: ../src/plane.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/alex/Work/rayTracer/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/rayTracer.dir/src/plane.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/rayTracer.dir/src/plane.cpp.o -c /home/alex/Work/rayTracer/src/plane.cpp
+
+CMakeFiles/rayTracer.dir/src/plane.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/rayTracer.dir/src/plane.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/alex/Work/rayTracer/src/plane.cpp > CMakeFiles/rayTracer.dir/src/plane.cpp.i
+
+CMakeFiles/rayTracer.dir/src/plane.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/rayTracer.dir/src/plane.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/alex/Work/rayTracer/src/plane.cpp -o CMakeFiles/rayTracer.dir/src/plane.cpp.s
+
+CMakeFiles/rayTracer.dir/src/plane.cpp.o.requires:
+.PHONY : CMakeFiles/rayTracer.dir/src/plane.cpp.o.requires
+
+CMakeFiles/rayTracer.dir/src/plane.cpp.o.provides: CMakeFiles/rayTracer.dir/src/plane.cpp.o.requires
+	$(MAKE) -f CMakeFiles/rayTracer.dir/build.make CMakeFiles/rayTracer.dir/src/plane.cpp.o.provides.build
+.PHONY : CMakeFiles/rayTracer.dir/src/plane.cpp.o.provides
+
+CMakeFiles/rayTracer.dir/src/plane.cpp.o.provides.build: CMakeFiles/rayTracer.dir/src/plane.cpp.o
+
 CMakeFiles/rayTracer.dir/src/main.cpp.o: CMakeFiles/rayTracer.dir/flags.make
 CMakeFiles/rayTracer.dir/src/main.cpp.o: ../src/main.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/alex/Work/rayTracer/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/alex/Work/rayTracer/build/CMakeFiles $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/rayTracer.dir/src/main.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/rayTracer.dir/src/main.cpp.o -c /home/alex/Work/rayTracer/src/main.cpp
 
@@ -170,6 +193,7 @@ rayTracer_OBJECTS = \
 "CMakeFiles/rayTracer.dir/src/ray.cpp.o" \
 "CMakeFiles/rayTracer.dir/src/object.cpp.o" \
 "CMakeFiles/rayTracer.dir/src/sphere.cpp.o" \
+"CMakeFiles/rayTracer.dir/src/plane.cpp.o" \
 "CMakeFiles/rayTracer.dir/src/main.cpp.o"
 
 # External object files for target rayTracer
@@ -179,6 +203,7 @@ rayTracer_EXTERNAL_OBJECTS =
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/ray.cpp.o
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/object.cpp.o
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/sphere.cpp.o
+../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/plane.cpp.o
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/main.cpp.o
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/build.make
 ../bin/debug/rayTracer: /usr/lib64/libsfml-system.so
@@ -198,6 +223,7 @@ CMakeFiles/rayTracer.dir/requires: CMakeFiles/rayTracer.dir/src/vec3.cpp.o.requi
 CMakeFiles/rayTracer.dir/requires: CMakeFiles/rayTracer.dir/src/ray.cpp.o.requires
 CMakeFiles/rayTracer.dir/requires: CMakeFiles/rayTracer.dir/src/object.cpp.o.requires
 CMakeFiles/rayTracer.dir/requires: CMakeFiles/rayTracer.dir/src/sphere.cpp.o.requires
+CMakeFiles/rayTracer.dir/requires: CMakeFiles/rayTracer.dir/src/plane.cpp.o.requires
 CMakeFiles/rayTracer.dir/requires: CMakeFiles/rayTracer.dir/src/main.cpp.o.requires
 .PHONY : CMakeFiles/rayTracer.dir/requires
 

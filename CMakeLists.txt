@@ -34,6 +34,7 @@ set (RAYTRACER_SOURCES
     ${RAYTRACER_SOURCE_DIR}/ray.cpp
     ${RAYTRACER_SOURCE_DIR}/object.cpp
     ${RAYTRACER_SOURCE_DIR}/sphere.cpp
+    ${RAYTRACER_SOURCE_DIR}/plane.cpp
     ${RAYTRACER_SOURCE_DIR}/main.cpp
 )
 

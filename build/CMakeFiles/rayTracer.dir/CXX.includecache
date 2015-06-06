@@ -12,6 +12,14 @@ vec3.hpp
 ray.hpp
 -
 
+../include/plane.hpp
+object.hpp
+-
+vec3.hpp
+-
+ray.hpp
+-
+
 ../include/ray.hpp
 vec3.hpp
 -
@@ -35,6 +43,8 @@ object.hpp
 -
 sphere.hpp
 -
+plane.hpp
+-
 SFML/Graphics.hpp
 -
 iostream
@@ -46,6 +56,10 @@ algorithm
 object.hpp
 -
 
+/home/alex/Work/rayTracer/src/plane.cpp
+plane.hpp
+-
+
 /home/alex/Work/rayTracer/src/ray.cpp
 ray.hpp
 -
@@ -54,8 +68,6 @@ ray.hpp
 sphere.hpp
 -
 cmath
--
-iostream
 -
 
 /home/alex/Work/rayTracer/src/vec3.cpp
