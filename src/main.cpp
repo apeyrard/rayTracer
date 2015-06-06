@@ -20,20 +20,20 @@ double EPSILON = 1.0e-07;
 
 void initModel(std::vector<Object*>* listObjects)
 {
-    Sphere* s = new Sphere(Vec3(0, 0, 0), 5, Vec3(255, 0, 0 ), 0, 0.8);
-    Sphere* sx = new Sphere(Vec3(10, 0, 0), 5, Vec3(0, 255, 0 ), 0, 0.8);
-    Sphere* sy = new Sphere(Vec3(0, 10, 0), 5, Vec3(0, 0, 255 ), 0, 0.8);
-    Sphere* sz = new Sphere(Vec3(0, 0, 10), 5, Vec3(0, 255, 255 ), 0, 0.8);
+    Sphere* s = new Sphere(Vec3(0, 0, 0), 5, Vec3(1, 0, 0 ), 0, 0.8);
+    Sphere* sx = new Sphere(Vec3(10, 0, 0), 5, Vec3(0, 1, 0 ), 0, 0.8);
+    Sphere* sy = new Sphere(Vec3(0, 10, 0), 5, Vec3(0, 0, 1), 0, 0.8);
+    Sphere* sz = new Sphere(Vec3(0, 0, 10), 5, Vec3(0, 1, 1), 0, 0.8);
 
-    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0,255 ,255 ), 0.5, 0.2, 0.5);
-    Sphere* s3 = new Sphere(Vec3(50, -50, 1), 50, Vec3(0,255 ,255 ), 0, 0.5, 0.5);
+    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0, 1, 1), 0.5, 0.2, 0.5);
+    Spere* s3 = new Sphere(Vec3(50, -50, 1), 50, Vec3(0, 1, 1), 0, 0.5, 0.5);
 
-    Plane* sol = new Plane(Vec3(0, 1, 0).norm(), -200, Vec3(255, 255, 255), 0, 0.8);
-    Plane* plafond = new Plane(Vec3(0, 1, 0), 200, Vec3(255, 255, 50), 0, 0.8);
-    Plane* gauche = new Plane(Vec3(1, 0, 0).norm(), 200, Vec3(200, 50, 255), 0, 0.8);
-    Plane* droite = new Plane(Vec3(1, 0, 0).norm(), -200, Vec3(50, 250, 255), 0, 0.8);
-    Plane* derriere = new Plane(Vec3(0, 0, 1).norm(), 200, Vec3(50, 250, 255), 0.8, 0.2);
-    Plane* fond = new Plane(Vec3(0, 0, 1).norm(), -150, Vec3(50, 250, 55), 0, 0.8);
+    Plane* sol = new Plane(Vec3(0, 1, 0).norm(), -200, Vec3(1, 1, 1), 0, 0.8);
+    Plane* plafond = new Plane(Vec3(0, 1, 0), 200, Vec3(1, 1, 0.2), 0, 0.8);
+    Plane* gauche = new Plane(Vec3(1, 0, 0).norm(), 200, Vec3(0.8, 0.1, 1), 0, 0.8);
+    Plane* droite = new Plane(Vec3(1, 0, 0).norm(), -200, Vec3(0.2, 1, 1), 0, 0.8);
+    Plane* derriere = new Plane(Vec3(0, 0, 1).norm(), 200, Vec3(0.2, 1, 1), 0.8, 0.2);
+    Plane* fond = new Plane(Vec3(0, 0, 1).norm(), -150, Vec3(0.5, 1.0, 0.2), 0, 0.8);
     listObjects->push_back(s);
     listObjects->push_back(sx);
     listObjects->push_back(sy);
@@ -168,9 +168,9 @@ int main()
                 finalColor += getColor(listObjects, r , lights)/(SAMPLES*SAMPLES);
             }
             }
-            pixels[x*4 + y*WIDTH*4] = std::min(finalColor.x, 255.0); //TODO less naive clamp
-            pixels[x*4 + y*WIDTH*4 +1] = std::min(finalColor.y, 255.0);
-            pixels[x*4 + y*WIDTH*4 +2] = std::min(finalColor.z, 255.0);
+            pixels[x*4 + y*WIDTH*4] = std::min(finalColor.x*255.0, 255.0); //TODO less naive clamp
+            pixels[x*4 + y*WIDTH*4 +1] = std::min(finalColor.y*255.0, 255.0);
+            pixels[x*4 + y*WIDTH*4 +2] = std::min(finalColor.z*255.0, 255.0);
             pixels[x*4 + y*WIDTH*4 +3] = 255;
         }
         texture.update(pixels);
