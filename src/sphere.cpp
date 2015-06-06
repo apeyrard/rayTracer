@@ -3,8 +3,8 @@
 
 namespace raytracer{
 
-Sphere::Sphere(Vec3 pos, double radius, Vec3 color, double reflection, double diffuse)
-    : Object(pos, color, reflection, diffuse)
+Sphere::Sphere(Vec3 pos, double radius, Vec3 color, double reflection, double diffuse, double spec)
+    : Object(pos, color, reflection, diffuse, spec)
     , radius(radius)
 {
 }

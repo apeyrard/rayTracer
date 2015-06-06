@@ -51,6 +51,8 @@ iostream
 -
 algorithm
 -
+cmath
+-
 
 /home/alex/Work/rayTracer/src/object.cpp
 object.hpp

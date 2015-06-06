@@ -4,8 +4,8 @@
 
 namespace raytracer{
 
-Plane::Plane(Vec3 normal, double dist, Vec3 color, double reflection, double diffuse)
-    : Object(normal, color, reflection, diffuse)
+Plane::Plane(Vec3 normal, double dist, Vec3 color, double reflection, double diffuse, double spec)
+    : Object(normal, color, reflection, diffuse, spec)
     , dist(dist)
 {
 }

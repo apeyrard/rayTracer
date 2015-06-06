@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 // TODO : replace auto computation of normal by getnormal when needed
 
@@ -14,7 +15,7 @@ using namespace raytracer;
 int MAXDEPTH = 10;
 int WIDTH = 800;
 int HEIGHT = 600;
-int SAMPLES = 1;
+double SAMPLES = 4.0; // 16X supersampling
 double EPSILON = 1.0e-07;
 
 void initModel(std::vector<Object*>* listObjects)
@@ -24,8 +25,8 @@ void initModel(std::vector<Object*>* listObjects)
     Sphere* sy = new Sphere(Vec3(0, 10, 0), 5, Vec3(0, 0, 255 ), 0, 0.8);
     Sphere* sz = new Sphere(Vec3(0, 0, 10), 5, Vec3(0, 255, 255 ), 0, 0.8);
 
-    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0,255 ,255 ), 0.8, 0.2);
-    Sphere* s3 = new Sphere(Vec3(50, -50, 1), 50, Vec3(0,255 ,255 ), 0, 0.8);
+    Sphere* s2 = new Sphere(Vec3(50, 50, 1), 50, Vec3(0,255 ,255 ), 0.8, 0.2, 0.5);
+    Sphere* s3 = new Sphere(Vec3(50, -50, 1), 50, Vec3(0,255 ,255 ), 0, 0.5, 0.5);
 
     Plane* sol = new Plane(Vec3(0, 1, 0).norm(), -200, Vec3(255, 255, 255), 0, 0.8);
     Plane* plafond = new Plane(Vec3(0, 1, 0), 200, Vec3(255, 255, 50), 0, 0.8);
@@ -104,6 +105,17 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Vec3> lights)
                     result += minObj->color * diff; //TODO * light.color
                 }
             }
+            // add spec lighting
+            if((minObj->spec > 0) and (!inShadow))
+            {
+                Vec3 reflDir = shadowRay.direction - minNormal * (shadowRay.direction.dot(minNormal) *2);
+                double dot = r.direction.dot(reflDir);
+                if (dot > 0)
+                {
+                    double spec = pow(dot, 20) * minObj->spec;
+                    result += minObj->color*spec;
+                }
+            }
         }
 
         // Get reflection
@@ -148,10 +160,13 @@ int main()
         {
             Vec3 finalColor = Vec3();
             Vec3 origin = Vec3(0, 0, -150);
-            Ray r = Ray(origin, Vec3(x-(WIDTH/2), y-(HEIGHT/2), -origin.z));
-            for (int i = 0; i < SAMPLES; ++i)
+            for (double dx = double(x); dx < double(x)+1; dx += 1.0/SAMPLES)
             {
-                finalColor = getColor(listObjects, r , lights);
+            for (double dy = double(y); dy < double(y)+1; dy += 1.0/SAMPLES)
+            {
+                Ray r = Ray(origin, Vec3(dx-(WIDTH/2), dy-(HEIGHT/2), -origin.z));
+                finalColor += getColor(listObjects, r , lights)/(SAMPLES*SAMPLES);
+            }
             }
             pixels[x*4 + y*WIDTH*4] = std::min(finalColor.x, 255.0); //TODO less naive clamp
             pixels[x*4 + y*WIDTH*4 +1] = std::min(finalColor.y, 255.0);
