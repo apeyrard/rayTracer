@@ -1,16 +1,15 @@
 #include <sphere.hpp>
 #include <cmath>
 
-
 namespace raytracer{
 
-Sphere::Sphere(Vec3 pos, double radius, Vec3 color)
-    : Object(pos, color)
+Sphere::Sphere(Vec3 pos, double radius, Vec3 color, double reflection, double diffuse)
+    : Object(pos, color, reflection, diffuse)
     , radius(radius)
 {
 }
 
-double Sphere::intersect(const Ray& ray) const
+double Sphere::intersect(const Ray& ray, Vec3& normal) const
 {
     // ray direction is normalized do A = 1
     double B = 2*(ray.direction.x * (ray.origin.x - pos.x) + ray.direction.y * (ray.origin.y - pos.y) + ray.direction.z * (ray.origin.z - pos.z));
@@ -27,6 +26,8 @@ double Sphere::intersect(const Ray& ray) const
     if (t0 > 0)
     {
         //closest intersection is t0
+        Vec3 intersec = ray.origin + (ray.direction * t0);
+        normal = ((intersec - pos)/radius).norm(); //TODO check if norm necessary
         return t0;
     }
 
@@ -34,6 +35,8 @@ double Sphere::intersect(const Ray& ray) const
     if (t1 > 0)
     {
         //closest intersection is t1
+        Vec3 intersec = ray.origin + (ray.direction * t0);
+        normal = (intersec - pos)/radius;
         return t1;
     }
 

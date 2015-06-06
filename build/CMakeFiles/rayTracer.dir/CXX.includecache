@@ -29,6 +29,16 @@ ray.hpp
 /home/alex/Work/rayTracer/src/main.cpp
 vec3.hpp
 -
+vector
+-
+object.hpp
+-
+sphere.hpp
+-
+SFML/Graphics.hpp
+-
+iostream
+-
 
 /home/alex/Work/rayTracer/src/object.cpp
 object.hpp

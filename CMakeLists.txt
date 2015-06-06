@@ -54,3 +54,10 @@ if (rayTracer_build_tests)
     target_link_libraries(rayTracer_test ${GTEST_BOTH_LIBRARIES} raytracer)
     add_test(rayTracer-tests ${CMAKE_SOURCE_DIR}/bin/debug/rayTracer_test)
 endif()
+
+
+find_package(SFML 2 REQUIRED system window graphics network audio)
+if(SFML_FOUND)
+    include_directories(${SFML_INCLUDE_DIR})
+    target_link_libraries(rayTracer ${SFML_LIBRARIES})
+endif()

@@ -9,10 +9,9 @@ namespace raytracer{
 class Sphere: public Object
 {
 public:
-    Sphere(Vec3 center, double radius, Vec3 color);
-    virtual double intersect(const Ray& ray) const override;
+    Sphere(Vec3 center, double radius, Vec3 color, double reflection=0.0, double diffuse=1.0);
+    virtual double intersect(const Ray& ray, Vec3& normal) const override;
 protected:
-    Vec3 center;
     double radius;
 };
 

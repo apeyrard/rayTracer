@@ -181,6 +181,11 @@ rayTracer_EXTERNAL_OBJECTS =
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/sphere.cpp.o
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/src/main.cpp.o
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/build.make
+../bin/debug/rayTracer: /usr/lib64/libsfml-system.so
+../bin/debug/rayTracer: /usr/lib64/libsfml-window.so
+../bin/debug/rayTracer: /usr/lib64/libsfml-graphics.so
+../bin/debug/rayTracer: /usr/lib64/libsfml-network.so
+../bin/debug/rayTracer: /usr/lib64/libsfml-audio.so
 ../bin/debug/rayTracer: CMakeFiles/rayTracer.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable ../bin/debug/rayTracer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/rayTracer.dir/link.txt --verbose=$(VERBOSE)

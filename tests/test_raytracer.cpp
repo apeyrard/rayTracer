@@ -126,16 +126,23 @@ TEST(vec3, crossProduct)
 
 TEST(sphere, intersection)
 {
+    Vec3 n = Vec3();
     Sphere s = Sphere(Vec3(5, 0, 0), 1, Vec3(255, 255, 255));
     Ray r = Ray(Vec3(0, 0, 0), Vec3(1, 0, 0));
 
     //should hit at 4
-    EXPECT_DOUBLE_EQ(s.intersect(r), 4.0);
+    EXPECT_DOUBLE_EQ(s.intersect(r, n), 4.0);
+    EXPECT_DOUBLE_EQ(n.x, -1);
+    EXPECT_DOUBLE_EQ(n.y, 0);
+    EXPECT_DOUBLE_EQ(n.z, 0);
 
     Ray r2 = Ray(Vec3(0, 0, 0), Vec3(2, 0, 0));
 
     //should hit at 4 too due to norm
-    EXPECT_DOUBLE_EQ(s.intersect(r2), 4.0);
+    EXPECT_DOUBLE_EQ(s.intersect(r2, n), 4.0);
+    EXPECT_DOUBLE_EQ(n.x, -1);
+    EXPECT_DOUBLE_EQ(n.y, 0);
+    EXPECT_DOUBLE_EQ(n.z, 0);
 
     Ray r3 = Ray(Vec3(0, 1, 0), Vec3(1, 0, 0));
     Ray r4 = Ray(Vec3(0, -1, 0), Vec3(1, 0, 0));
@@ -143,24 +150,34 @@ TEST(sphere, intersection)
     Ray r6 = Ray(Vec3(0, 0, -1), Vec3(1, 0, 0));
 
     //should hit at 5
-    EXPECT_DOUBLE_EQ(s.intersect(r3), 5.0);
-    EXPECT_DOUBLE_EQ(s.intersect(r4), 5.0);
-    EXPECT_DOUBLE_EQ(s.intersect(r5), 5.0);
-    EXPECT_DOUBLE_EQ(s.intersect(r6), 5.0);
+    EXPECT_DOUBLE_EQ(s.intersect(r3, n), 5.0);
+    EXPECT_DOUBLE_EQ(s.intersect(r4, n), 5.0);
+    EXPECT_DOUBLE_EQ(s.intersect(r5, n), 5.0);
+    EXPECT_DOUBLE_EQ(s.intersect(r6, n), 5.0);
+    EXPECT_DOUBLE_EQ(n.x, 0);
+    EXPECT_DOUBLE_EQ(n.y, 0);
+    EXPECT_DOUBLE_EQ(n.z, -1);
 
     //should not hit
     Ray r7 = Ray(Vec3(0, 1.01, 0), Vec3(1, 0, 0));
     Ray r8 = Ray(Vec3(0, -1.01, 0), Vec3(1, 0, 0));
     Ray r9 = Ray(Vec3(0, 0, 1.01), Vec3(1, 0, 0));
     Ray r10 = Ray(Vec3(0, 0, -1.01), Vec3(1, 0, 0));
-    EXPECT_DOUBLE_EQ(s.intersect(r7), 0);
-    EXPECT_DOUBLE_EQ(s.intersect(r8), 0);
-    EXPECT_DOUBLE_EQ(s.intersect(r9), 0);
-    EXPECT_DOUBLE_EQ(s.intersect(r10), 0);
+    EXPECT_DOUBLE_EQ(s.intersect(r7, n), 0);
+    EXPECT_DOUBLE_EQ(s.intersect(r8, n), 0);
+    EXPECT_DOUBLE_EQ(s.intersect(r9, n), 0);
+    EXPECT_DOUBLE_EQ(s.intersect(r10, n), 0);
+    // Thus norm shouldn't change
+    EXPECT_DOUBLE_EQ(n.x, 0);
+    EXPECT_DOUBLE_EQ(n.y, 0);
+    EXPECT_DOUBLE_EQ(n.z, -1);
 
     Ray r11 = Ray(Vec3(12, 3.5, 2), Vec3(1, 1, 1));
     Sphere s2 = Sphere(Vec3(24, 15.5, 14), 10, Vec3(255, 255, 255));
-    EXPECT_NE(s2.intersect(r11), 0);
+    EXPECT_NE(s2.intersect(r11, n), 0);
+    EXPECT_NE(n.x, 0);
+    EXPECT_NE(n.y, 0);
+    EXPECT_NE(n.z, 0);
 
 
 }
