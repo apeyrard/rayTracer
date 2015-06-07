@@ -14,6 +14,8 @@ public:
     virtual double intersect(const Ray& ray, Vec3& normal) const = 0;
     virtual Vec3 getRandPoint(std::default_random_engine &rng) const = 0;
     Vec3 color;
+    virtual double getMinPos(const Vec3 axis) const = 0;
+    virtual double getMaxPos(const Vec3 axis) const = 0;
     double reflection;
     double diffuse;
     double spec;

@@ -189,4 +189,37 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
     return tnear;
 }
 
+double Box::getMinPos(const Vec3 axis) const
+{
+    if(axis.x != 0)
+    {
+        return pos.x - dimensions.x;
+    }
+    else if(axis.y != 0)
+    {
+        return pos.y - dimensions.y;
+    }
+    else if(axis.z != 0)
+    {
+        return pos.z - dimensions.z;
+    }
+}
+
+double Box::getMaxPos(const Vec3 axis) const
+{
+    if(axis.x != 0)
+    {
+        return pos.x + dimensions.x;
+    }
+    else if(axis.y != 0)
+    {
+        return pos.y + dimensions.y;
+    }
+    else if(axis.z != 0)
+    {
+        return pos.z + dimensions.z;
+    }
+
+}
+
 }

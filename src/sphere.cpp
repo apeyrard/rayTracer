@@ -54,4 +54,37 @@ Vec3 Sphere::getRandPoint(std::default_random_engine &rng) const
     return randVec;
 }
 
+double Sphere::getMinPos(const Vec3 axis) const
+{
+    if(axis.x != 0)
+    {
+        return pos.x - radius;
+    }
+    else if(axis.y != 0)
+    {
+        return pos.y - radius;
+    }
+    else if(axis.z != 0)
+    {
+        return pos.z - radius;
+    }
+}
+
+double Sphere::getMaxPos(const Vec3 axis) const
+{
+    if(axis.x != 0)
+    {
+        return pos.x + radius;
+    }
+    else if(axis.y != 0)
+    {
+        return pos.y + radius;
+    }
+    else if(axis.z != 0)
+    {
+        return pos.z + radius;
+    }
+
+}
+
 }

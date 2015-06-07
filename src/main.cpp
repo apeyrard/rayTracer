@@ -7,63 +7,62 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <constants.hpp>
 #include <vec3.hpp>
 #include <object.hpp>
 #include <sphere.hpp>
 #include <plane.hpp>
 #include <box.hpp>
+#include <kdnode.hpp>
 // TODO : replace auto computation of normal by getnormal when needed
 // TODO : monte carlo
 
 using namespace raytracer;
 
-int MAXDEPTH = 5;
-int MAXREFLDEPTH = 5;
-int WIDTH = 800;
-int HEIGHT = 600;
-double SAMPLES = 8.0;
-double EPSILON = 1.0e-07;
+
+/*KDNode buildKDTree(std::vector<Objects*> objects, Vec3 axis, Vec3 dimensions, Vec3 pos)
+{
+}*/
 
 
 void initModel(std::vector<Object*>* listObjects, std::vector<Object*>* lights)
 {
-    Sphere* s = new Sphere(Vec3(0, 0, 0), 5, Vec3(1, 0, 0 ), 0, 0.8);
-    Sphere* sx = new Sphere(Vec3(10, 0, 0), 5, Vec3(0, 1, 0 ), 0, 0.8);
-    Sphere* sy = new Sphere(Vec3(0, 10, 0), 5, Vec3(0, 0, 1), 0, 0.8);
-    Sphere* sz = new Sphere(Vec3(0, 0, 10), 5, Vec3(0, 1, 1), 0, 0.8);
+    Sphere* c = new Sphere(Vec3(0, 0, 0), 20, Vec3(1, 1, 1), 0, 1, 0);
+    Sphere* x = new Sphere(Vec3(20, 0, 0), 20, Vec3(1, 0, 0), 0, 1, 0);
+    Sphere* y = new Sphere(Vec3(0, 20, 0), 20, Vec3(0, 1, 0), 0, 1, 0);
+    Sphere* z = new Sphere(Vec3(0, 0, 20), 20, Vec3(0, 0, 1), 0, 1, 0);
+
 
     Sphere* s2 = new Sphere(Vec3(50, 50, 20), 50, Vec3(0, 1, 1), 0.8, 0.2, 0);
-    Sphere* s3 = new Sphere(Vec3(50, -150, 1), 50, Vec3(0, 1, 1), 0, 0.5, 0.5);
+    Sphere* s3 = new Sphere(Vec3(150, -150, -50), 50, Vec3(0, 1, 1), 0, 0.4, 1.0);
 
-    Sphere* lum = new Sphere(Vec3(0, -100, 1), 50, Vec3(1, 1, 1), 0, 0, 0, 0, 1);
+    Sphere* lum = new Sphere(Vec3(0, 200, -200), 50, Vec3(1, 1, 1), 0, 0, 0, 0, 1);
 
-    Plane* sol = new Plane(Vec3(0, 1, 0).norm(), -200, Vec3(1, 1, 1), 0, 0.8);
-    Plane* plafond = new Plane(Vec3(0, 1, 0), 200, Vec3(1, 1, 0.2), 0, 0.8);
-    Plane* gauche = new Plane(Vec3(1, 0, 0).norm(), 200, Vec3(0.8, 0.1, 1), 0, 0.8);
-    Plane* droite = new Plane(Vec3(1, 0, 0).norm(), -200, Vec3(0.2, 1, 1), 1, 0);
-    Plane* derriere = new Plane(Vec3(0, 0, 1).norm(), 2000, Vec3(0.2, 1, 1), 0.8, 0.2);
-    Plane* fond = new Plane(Vec3(0, 0, 1).norm(), -150, Vec3(0.5, 1.0, 0.2), 0, 0.8);
     Box* b = new Box(Vec3(140, 140, 90), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0.8, 0, 0.0, 0.0, 0.0);
 
-    listObjects->push_back(b);
+    Box* sol = new Box(Vec3(0, -100, 0), Vec3(), Vec3(400, 5, 400), Vec3(1, 1, 1), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* plafond = new Box(Vec3(0, -200, 0), Vec3(), Vec3(400, 5, 4000), Vec3(1, 1, 0), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* gauche = new Box(Vec3(-200, 0, 0), Vec3(), Vec3(5, 400, 4000), Vec3(1, 0, 1), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* droite = new Box(Vec3(200, 0, 0), Vec3(), Vec3(5, 400, 4000), Vec3(0.5 ,0.5 , 0.5), 0.8, 0, 0.2, 0.0, 0.0);
+    Box* fond = new Box(Vec3(0, 0, 200), Vec3(), Vec3(400, 400, 5), Vec3(0,1 , 0.3), 0, 0.6, 0.2, 0.0, 0.0);
 
-    listObjects->push_back(s);
-    listObjects->push_back(sx);
-    listObjects->push_back(sy);
-    listObjects->push_back(sz);
+    /*listObjects->push_back(b);
 
     listObjects->push_back(s2);
-    listObjects->push_back(s3);
+    listObjects->push_back(s3);*/
 
     listObjects->push_back(lum);
     lights->push_back(lum);
 
     listObjects->push_back(sol);
-    listObjects->push_back(plafond);
+    listObjects->push_back(c);
+    listObjects->push_back(x);
+    listObjects->push_back(y);
+    listObjects->push_back(z);
+    /*listObjects->push_back(plafond);
     listObjects->push_back(gauche);
     listObjects->push_back(droite);
-    listObjects->push_back(derriere);
-    listObjects->push_back(fond);
+    listObjects->push_back(fond);*/
 }
 
 Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission)
@@ -120,7 +119,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         }
 
         //diff
-        if (minObj->diffuse > 0)
+        if ((minObj->diffuse > 0) or (minObj->spec > 0))
         {
             //TODO make this faster by getting shadow percentage
             //for each light, check if we are in shadow
@@ -153,6 +152,14 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
                         result += minObj->color * (*lightIt)->color * diff;
                     }
 
+                    // add spec lighting
+                    Vec3 reflDir = shadowRay.direction - minNormal * (shadowRay.direction.dot(minNormal) *2);
+                    dot = r.direction.dot(reflDir);
+                    if (dot > 0)
+                    {
+                        double spec = pow(dot, 50) * minObj->spec;
+                        result += minObj->color * (*lightIt)->color * spec;
+                    }
                 }
                 if (r.depth < MAXDEPTH)
                 {
@@ -167,17 +174,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
                     result += minObj->color * (getColor(objects, randomRay, lights, emittance, 0)) * diff;
                 }
             }
-            /*// add spec lighting
-            if((minObj->spec > 0) and (!inShadow))
-            {
-                Vec3 reflDir = shadowRay.direction - minNormal * (shadowRay.direction.dot(minNormal) *2);
-                double dot = r.direction.dot(reflDir);
-                if (dot > 0)
-                {
-                    double spec = pow(dot, 128) * minObj->spec;
-                    result += minObj->color*spec;
-                }
-            }*/
+
         }
 
 
@@ -200,34 +197,45 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
 int main()
 {
     sf::Texture texture;
-    texture.create(WIDTH, HEIGHT);
-    sf::Uint8* pixels = new sf::Uint8[WIDTH * HEIGHT * 4];
-    sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Ray Tracer");
+    texture.create(SIZE, SIZE);
+    sf::Uint8* pixels = new sf::Uint8[SIZE * SIZE * 4];
+    sf::RenderWindow window(sf::VideoMode(SIZE, SIZE), "Ray Tracer");
 
     std::vector<Object*> listObjects;
     std::vector<Object*> lights;
     initModel(&listObjects, &lights);
 
-    for (int y = 0; y < HEIGHT; ++y)
+    //Camera stuff
+    Vec3 cameraPos = Vec3(2000, 0, 2000);
+    Vec3 cameraDir = Vec3(-1, 0, -1).norm();
+    Vec3 cameraUp = Vec3(0, 1, 0).norm();
+    Vec3 cameraRight = cameraDir.cross(cameraUp);
+    double fieldOfView = 1.0;
+
+    for (int y = 0; y < SIZE; ++y)
     {
         //std::cout << x << std::endl;
         #pragma omp parallel for schedule(dynamic, 1)
-        for (int x = 0; x < WIDTH; ++x)
+        for (int x = 0; x < SIZE; ++x)
         {
             Vec3 finalColor = Vec3();
-            Vec3 origin = Vec3(0, 0, -1500);
             for (int dx = 0; dx < SAMPLES; ++dx)
             {
             for (int dy = 0; dy < SAMPLES; ++dy)
             {
-                Ray r = Ray(origin, Vec3(double(x)+(dx/SAMPLES)-(WIDTH/2), double(y)+(dy/SAMPLES)-(HEIGHT/2), -origin.z));
+                double dist = SIZE / fieldOfView;
+                double curX = double(x) + dx/SAMPLES - SIZE/2;
+                double curY = double(y) + dy/SAMPLES - SIZE/2;
+                Vec3 imagePoint = cameraUp * curY + cameraRight * curX + cameraDir * dist + cameraPos;
+
+                Ray r = Ray(cameraPos, imagePoint-cameraPos);
                 finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1)/(SAMPLES*SAMPLES);
             }
             }
-            pixels[x*4 + y*WIDTH*4] = std::min(finalColor.x*255.0, 255.0); //TODO less naive clamp
-            pixels[x*4 + y*WIDTH*4 +1] = std::min(finalColor.y*255.0, 255.0);
-            pixels[x*4 + y*WIDTH*4 +2] = std::min(finalColor.z*255.0, 255.0);
-            pixels[x*4 + y*WIDTH*4 +3] = 255;
+            pixels[x*4 + (SIZE - y - 1)*SIZE*4] = std::min(finalColor.x*255.0, 255.0); //TODO less naive clamp
+            pixels[x*4 + (SIZE - y -1) *SIZE*4 +1] = std::min(finalColor.y*255.0, 255.0);
+            pixels[x*4 + (SIZE - y - 1)*SIZE*4 +2] = std::min(finalColor.z*255.0, 255.0);
+            pixels[x*4 + (SIZE -y -1)*SIZE*4 +3] = 255;
         }
         texture.update(pixels);
 

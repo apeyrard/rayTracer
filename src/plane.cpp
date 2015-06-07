@@ -54,4 +54,37 @@ Vec3 Plane::getRandPoint(std::default_random_engine &rng) const
     return Vec3();
 }
 
+double Plane::getMinPos(const Vec3 axis) const
+{
+    if(axis.x != 0)
+    {
+        return pos.x - dimensions.x;
+    }
+    else if(axis.y != 0)
+    {
+        return pos.y - dimensions.y;
+    }
+    else if(axis.z != 0)
+    {
+        return pos.z - dimensions.z;
+    }
+}
+
+double Plane::getMaxPos(const Vec3 axis) const
+{
+    if(axis.x != 0)
+    {
+        return pos.x + dimensions.x;
+    }
+    else if(axis.y != 0)
+    {
+        return pos.y + dimensions.y;
+    }
+    else if(axis.z != 0)
+    {
+        return pos.z + dimensions.z;
+    }
+
+}
+
 }
