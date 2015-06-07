@@ -1,11 +1,11 @@
 #include <plane.hpp>
 
-//#include <iostream>
+#include <iostream>
 
 namespace raytracer{
 
-Plane::Plane(Vec3 normal, double dist, Vec3 color, double reflection, double diffuse, double spec)
-    : Object(normal, color, reflection, diffuse, spec)
+Plane::Plane(Vec3 normal, double dist, Vec3 color, double reflection, double diffuse, double spec, double light)
+    : Object(normal, color, reflection, diffuse, spec, 0, light)
     , dist(dist)
 {
 }
@@ -46,6 +46,12 @@ double Plane::intersect(const Ray& ray, Vec3& normal) const
     }
     //std::cout << "inter at " << t << std::endl;
     return t;
+}
+
+Vec3 Plane::getRandPoint(std::default_random_engine &rng) const
+{
+    std::cout << "NOT IMPLEMENTED YET" << std::endl;
+    return Vec3();
 }
 
 }

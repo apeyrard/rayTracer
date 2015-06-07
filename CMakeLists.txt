@@ -15,7 +15,7 @@ set(RAYTRACER_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
 # Flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "-g -O2 -Wall -Wno-sign-compare")
+    set(CMAKE_CXX_FLAGS "-g -fopenmp -O2 -Wall -Wno-sign-compare")
     add_definitions(-std=gnu++0x)
 endif()
 
@@ -35,6 +35,7 @@ set (RAYTRACER_SOURCES
     ${RAYTRACER_SOURCE_DIR}/object.cpp
     ${RAYTRACER_SOURCE_DIR}/sphere.cpp
     ${RAYTRACER_SOURCE_DIR}/plane.cpp
+    ${RAYTRACER_SOURCE_DIR}/box.cpp
     ${RAYTRACER_SOURCE_DIR}/main.cpp
 )
 

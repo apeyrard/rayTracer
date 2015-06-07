@@ -3,6 +3,7 @@
 #include <vec3.hpp>
 #include <ray.hpp>
 #include <sphere.hpp>
+#include <box.hpp>
 
 using namespace raytracer;
 
@@ -179,6 +180,15 @@ TEST(sphere, intersection)
     EXPECT_NE(n.y, 0);
     EXPECT_NE(n.z, 0);
 
+
+}
+
+TEST(box, intersection)
+{
+    Vec3 n = Vec3();
+    Ray r1 = Ray(Vec3(0, 0, -100), Vec3(0, 0, 1));
+    Box b = Box(Vec3(0, 0, 0), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.25, 0.40), 0.0, 0.8, 0.0, 0.0, 0.0);
+    EXPECT_DOUBLE_EQ(b.intersect(r1, n), 50);
 
 }
 

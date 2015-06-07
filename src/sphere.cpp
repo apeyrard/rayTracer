@@ -1,10 +1,11 @@
 #include <sphere.hpp>
 #include <cmath>
+#include <iostream>
 
 namespace raytracer{
 
-Sphere::Sphere(Vec3 pos, double radius, Vec3 color, double reflection, double diffuse, double spec)
-    : Object(pos, color, reflection, diffuse, spec)
+Sphere::Sphere(Vec3 pos, double radius, Vec3 color, double reflection, double diffuse, double spec, double refr, double light)
+    : Object(pos, color, reflection, diffuse, spec, refr, light)
     , radius(radius)
 {
 }
@@ -41,6 +42,16 @@ double Sphere::intersect(const Ray& ray, Vec3& normal) const
     }
 
     return 0; // no positive solution : no intersection in desired direction
+}
+
+Vec3 Sphere::getRandPoint(std::default_random_engine &rng) const
+{
+    std::normal_distribution<double> gauss(0, 1);
+    //random normalized vector
+    Vec3 randVec = Vec3(gauss(rng), gauss(rng), gauss(rng)).norm();
+    randVec = randVec*radius + pos;
+    //std::cout << randVec.x << " " << randVec.y << " " << randVec.z << " " << randVec.length() << std::endl;
+    return randVec;
 }
 
 }
