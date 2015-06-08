@@ -37,7 +37,7 @@ double Sphere::intersect(const Ray& ray, Vec3& normal) const
     {
         //closest intersection is t1
         Vec3 intersec = ray.origin + (ray.direction * t0);
-        normal = (intersec - pos)/radius;
+        normal = ((intersec - pos)/radius).norm();
         return t1;
     }
 

@@ -13,16 +13,10 @@
 #include <sphere.hpp>
 #include <plane.hpp>
 #include <box.hpp>
-#include <kdnode.hpp>
 // TODO : replace auto computation of normal by getnormal when needed
 // TODO : monte carlo
-
+// TODO : kdtree
 using namespace raytracer;
-
-
-/*KDNode buildKDTree(std::vector<Objects*> objects, Vec3 axis, Vec3 dimensions, Vec3 pos)
-{
-}*/
 
 
 void initModel(std::vector<Object*>* listObjects, std::vector<Object*>* lights)
@@ -32,37 +26,44 @@ void initModel(std::vector<Object*>* listObjects, std::vector<Object*>* lights)
     Sphere* y = new Sphere(Vec3(0, 20, 0), 20, Vec3(0, 1, 0), 0, 1, 0);
     Sphere* z = new Sphere(Vec3(0, 0, 20), 20, Vec3(0, 0, 1), 0, 1, 0);
 
-
     Sphere* s2 = new Sphere(Vec3(50, 50, 20), 50, Vec3(0, 1, 1), 0.8, 0.2, 0);
-    Sphere* s3 = new Sphere(Vec3(150, -150, -50), 50, Vec3(0, 1, 1), 0, 0.4, 1.0);
+    Sphere* s3 = new Sphere(Vec3(150, -150, -50), 50, Vec3(0, 1, 1), 0, 0, 0, 1.5);
 
     Sphere* lum = new Sphere(Vec3(0, 200, -200), 50, Vec3(1, 1, 1), 0, 0, 0, 0, 1);
 
-    Box* b = new Box(Vec3(140, 140, 90), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0.8, 0, 0.0, 0.0, 0.0);
+    Box* b = new Box(Vec3(300, -300, -300), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0.8 , 0.20, 0, 0, 0.0);
+    Box* b2 = new Box(Vec3(-300, -300, -300), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0 , 0, 0, 1.33, 0.0);
 
-    Box* sol = new Box(Vec3(0, -100, 0), Vec3(), Vec3(400, 5, 400), Vec3(1, 1, 1), 0, 0.6, 0.2, 0.0, 0.0);
-    Box* plafond = new Box(Vec3(0, -200, 0), Vec3(), Vec3(400, 5, 4000), Vec3(1, 1, 0), 0, 0.6, 0.2, 0.0, 0.0);
-    Box* gauche = new Box(Vec3(-200, 0, 0), Vec3(), Vec3(5, 400, 4000), Vec3(1, 0, 1), 0, 0.6, 0.2, 0.0, 0.0);
-    Box* droite = new Box(Vec3(200, 0, 0), Vec3(), Vec3(5, 400, 4000), Vec3(0.5 ,0.5 , 0.5), 0.8, 0, 0.2, 0.0, 0.0);
-    Box* fond = new Box(Vec3(0, 0, 200), Vec3(), Vec3(400, 400, 5), Vec3(0,1 , 0.3), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* sol = new Box(Vec3(0, -500, 0), Vec3(), Vec3(500, 5, 500), Vec3(1, 1, 1), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* plafond = new Box(Vec3(0, 500, 0), Vec3(), Vec3(500, 5, 500), Vec3(1, 1, 0), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* gauche = new Box(Vec3(-500, 0, 0), Vec3(), Vec3(5, 500, 500), Vec3(1, 0, 1), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* droite = new Box(Vec3(500, 0, 0), Vec3(), Vec3(5, 500, 500), Vec3(0.5 ,0.5 , 0.5), 0, 0, 0, 1.5, 0.0);
+    Box* fond = new Box(Vec3(0, 0, -500), Vec3(), Vec3(500, 500, 5), Vec3(0, 1 , 0.3), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* derriere = new Box(Vec3(0, 0, 500), Vec3(), Vec3(500, 500, 5), Vec3(0, 1 , 0.3), 0.8, 0.2, 0, 0.0, 0.0);
 
-    /*listObjects->push_back(b);
+    listObjects->push_back(b);
+    listObjects->push_back(b2);
+    //listObjects->push_back(boite);
 
     listObjects->push_back(s2);
-    listObjects->push_back(s3);*/
+    listObjects->push_back(s3);
 
     listObjects->push_back(lum);
     lights->push_back(lum);
 
-    listObjects->push_back(sol);
     listObjects->push_back(c);
     listObjects->push_back(x);
     listObjects->push_back(y);
     listObjects->push_back(z);
-    /*listObjects->push_back(plafond);
+
+    //listObjects->push_back(globe);
+
+    listObjects->push_back(sol);
+    listObjects->push_back(fond);
+    listObjects->push_back(plafond);
     listObjects->push_back(gauche);
     listObjects->push_back(droite);
-    listObjects->push_back(fond);*/
+    //listObjects->push_back(derriere);
 }
 
 Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission)
@@ -164,7 +165,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
                 if (r.depth < MAXDEPTH)
                 {
                     std::normal_distribution<double> gauss(0,1);
-                    Ray randomRay = Ray(minInterPoint, Vec3(gauss(rng), gauss(rng), gauss(rng)), r.depth+1);
+                    Ray randomRay = Ray(minInterPoint, Vec3(gauss(rng), gauss(rng), gauss(rng)), r.depth+1, r.refr);
                     if (randomRay.direction.dot(minNormal) < 0)
                     {
                         randomRay.direction *= -1;
@@ -185,13 +186,48 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
             if (r.depth < MAXDEPTH)
             {
                 Vec3 reflDir = r.direction - minNormal * (r.direction.dot(minNormal) *2);
-                Ray reflectedRay = Ray(minInterPoint, reflDir, r.depth+1);
+                Ray reflectedRay = Ray(minInterPoint, reflDir, r.depth+1, r.refr);
                 Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1);
                 result += reflColor * refl;
             }
         }
+
+        // Get refraction
+        double objRefr = minObj->refr;
+        if (objRefr > 0.0)
+        {
+            if (r.depth < MAXDEPTH)
+            {
+                minInterPoint -= minNormal * EPSILON*2;
+                //std::cout << "hit at" << std::endl;
+                //std::cout << minInterPoint.x << " " << minInterPoint.y << " " << minInterPoint.z << std::endl;
+                double mediumRefr = r.refr;
+                double n = mediumRefr/objRefr;
+
+                minNormal *= (-1);
+
+                double cosI = minNormal.dot(r.direction) * (-1);
+                double cosT2 = 1.0 - n*n*(1.0-cosI*cosI);
+                //std::cout << cosT2 << std::endl;
+                if (cosT2 > 0.0)
+                {
+                    Vec3 T = (r.direction * n) - minNormal * (n*cosI - sqrt(cosT2));
+                    Ray refrRay = Ray(minInterPoint, T, r.depth+1, objRefr);
+                    Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1);
+                    //std::cout << refrColor.x << " " << refrColor.y << " " << refrColor.z << std::endl;
+                    result += refrColor;
+                }
+
+            }
+        }
     }
+    else
+    {
+        result = Vec3();
+    }
+
     return result;
+    //return (minNormal.norm() + Vec3(1, 1, 1)) /2;
 }
 
 int main()
@@ -206,10 +242,11 @@ int main()
     initModel(&listObjects, &lights);
 
     //Camera stuff
-    Vec3 cameraPos = Vec3(2000, 0, 2000);
-    Vec3 cameraDir = Vec3(-1, 0, -1).norm();
+    Vec3 cameraPos = Vec3(1000, 0, 2000);
+    Vec3 cameraDir = Vec3(-0.5, 0, -1).norm();
     Vec3 cameraUp = Vec3(0, 1, 0).norm();
     Vec3 cameraRight = cameraDir.cross(cameraUp);
+    cameraUp = cameraRight.cross(cameraDir);
     double fieldOfView = 1.0;
 
     for (int y = 0; y < SIZE; ++y)

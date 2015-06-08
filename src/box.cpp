@@ -1,6 +1,6 @@
 #include <box.hpp>
 #include <algorithm>
-//#include <iostream>
+#include <iostream>
 
 namespace raytracer{
 
@@ -49,6 +49,14 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
     {
         double t1 = (x1 - ray.origin.x)/ray.direction.x;
         double t2 = (x2 - ray.origin.x)/ray.direction.x;
+        if (t1 < 0)
+        {
+            t1 = -1;
+        }
+        if (t2 < 0)
+        {
+            t2= -1;
+        }
 
         if (t1 > t2)
         {
@@ -178,14 +186,27 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
         }
     }
 
+    /*if ((ray.origin.x < std::min(x1, x2)) or (ray.origin.x > std::max(x1,x2)) or (ray.origin.y < std::min(y1, y2)) or (ray.origin.y > std::max(y1,y2))
+    or (ray.origin.z < std::min(z1, z2)) or (ray.origin.z > std::max(z1,z2)))
+    {
+        if (ray.direction.dot(minNorm) > 0)
+        {
+            minNorm = minNorm * -1;
+        }
+    }
+    else*/
     if (ray.direction.dot(minNorm) > 0)
     {
-        minNorm = minNorm * -1;
+        minNorm *= -1;
     }
 
     normal = minNorm;
 
-    //std::cout << "hit" << std::endl;
+    if (tnear < 0)
+    {
+        return tfar;
+    }
+
     return tnear;
 }
 
