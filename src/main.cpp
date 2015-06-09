@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <cmath>
 
 #include <SFML/Graphics.hpp>
 
@@ -32,12 +33,16 @@ void initModel(std::vector<Object*>* listObjects, std::vector<Object*>* lights)
     Sphere* lum = new Sphere(Vec3(0, 200, -200), 50, Vec3(1, 1, 1), 0, 0, 0, 0, 1);
 
     Box* b = new Box(Vec3(300, -300, -300), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0.8 , 0.20, 0, 0, 0.0);
-    Box* b2 = new Box(Vec3(-300, -300, -300), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0 , 0, 0, 1.33, 0.0);
+    Box* b2 = new Box(Vec3(-300, -300, -300), Vec3(), Vec3(50, 50, 50), Vec3(0.35, 0.65, 0.80), 0 , 0, 0, 1.5, 0.0);
 
-    Box* sol = new Box(Vec3(0, -500, 0), Vec3(), Vec3(500, 5, 500), Vec3(1, 1, 1), 0, 0.6, 0.2, 0.0, 0.0);
-    Box* plafond = new Box(Vec3(0, 500, 0), Vec3(), Vec3(500, 5, 500), Vec3(1, 1, 0), 0, 0.6, 0.2, 0.0, 0.0);
+    //Sphere* globe = new Sphere(Vec3(0, 0, 0), 1000000, Vec3(0, 1, 1), 0, 0, 0, 1.5);
+
+    //Box* boite = new Box(Vec3(0, 0, 0), Vec3(), Vec3(3000, 3000, 3000), Vec3(0.35, 0.65, 0.80), 0 , 0, 0, 1.33, 0.0);
+
+    Box* sol = new Box(Vec3(0, -500, 0), Vec3(), Vec3(2000, 5, 2000), Vec3(1, 1, 1), 0, 0.6, 0.2, 0.0, 0.0);
+    Box* plafond = new Box(Vec3(0, 500, 0), Vec3(), Vec3(2000, 5, 2000), Vec3(1, 1, 0), 0, 0.6, 0.2, 0.0, 0.0);
     Box* gauche = new Box(Vec3(-500, 0, 0), Vec3(), Vec3(5, 500, 500), Vec3(1, 0, 1), 0, 0.6, 0.2, 0.0, 0.0);
-    Box* droite = new Box(Vec3(500, 0, 0), Vec3(), Vec3(5, 500, 500), Vec3(0.5 ,0.5 , 0.5), 0, 0, 0, 1.5, 0.0);
+    Box* droite = new Box(Vec3(500, 0, 0), Vec3(), Vec3(20, 500, 525), Vec3(0.5 ,0.5 , 0.5), 0, 0, 0, 1.5, 0.0);
     Box* fond = new Box(Vec3(0, 0, -500), Vec3(), Vec3(500, 500, 5), Vec3(0, 1 , 0.3), 0, 0.6, 0.2, 0.0, 0.0);
     Box* derriere = new Box(Vec3(0, 0, 500), Vec3(), Vec3(500, 500, 5), Vec3(0, 1 , 0.3), 0.8, 0.2, 0, 0.0, 0.0);
 
@@ -71,7 +76,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
     //Stop and return black if maxDepth
     if (r.depth >= MAXDEPTH)
     {
-        return Vec3();
+        return Vec3(0,0,0);
     }
 
     std::random_device rd;
@@ -198,32 +203,53 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         {
             if (r.depth < MAXDEPTH)
             {
-                minInterPoint -= minNormal * EPSILON*2;
-                //std::cout << "hit at" << std::endl;
-                //std::cout << minInterPoint.x << " " << minInterPoint.y << " " << minInterPoint.z << std::endl;
-                double mediumRefr = r.refr;
-                double n = mediumRefr/objRefr;
+                minInterPoint -= minNormal * EPSILON;
+                //std::cout << "hit at " << minInterPoint.x << " " << minInterPoint.y << " " << minInterPoint.z << " norm is "<< minNormal.x << " " << minNormal.y << " " << minNormal.z << " direction is " << r.direction.x << " " << r.direction.y << " " << r.direction.z << std::endl;
 
-                minNormal *= (-1);
+                //minNormal *= (-1);
 
-                double cosI = minNormal.dot(r.direction) * (-1);
-                double cosT2 = 1.0 - n*n*(1.0-cosI*cosI);
-                //std::cout << cosT2 << std::endl;
-                if (cosT2 > 0.0)
+                double R = r.refr/objRefr;
+                double nextRefr = objRefr;
+
+                if (r.refr != 1) //coming from, air
                 {
-                    Vec3 T = (r.direction * n) - minNormal * (n*cosI - sqrt(cosT2));
-                    Ray refrRay = Ray(minInterPoint, T, r.depth+1, objRefr);
-                    Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1);
-                    //std::cout << refrColor.x << " " << refrColor.y << " " << refrColor.z << std::endl;
-                    result += refrColor;
+                    R = objRefr;
+                    nextRefr = 1;
                 }
 
+                Vec3 refrDir;
+                bool TIP = false;
+                // Trying to detect total internal reflection
+                if ((r.refr > 1) or ((r.refr == 1) and (objRefr < 1)))
+                {
+                    double critAngle = asin(1/R);
+                    double incidentAngle = acos( (minNormal * (-1)).dot(r.direction) / (minNormal.length() * r.direction.length()) );
+                    //std::cout << critAngle << " " << incidentAngle << std::endl;
+                    if (incidentAngle > critAngle)
+                    {
+                        //std::cout << "TIP" << std::endl;
+                        refrDir = r.direction - minNormal * (r.direction.dot(minNormal) *2);
+                        TIP = true;
+                    }
+                }
+
+                if(!TIP)
+                {
+                    double C = (minNormal * (-1)).dot(r.direction);
+                    refrDir = r.direction * R + minNormal * (C * R - sqrt(1 - R*R * (1 - C*C)));
+                    minInterPoint += refrDir * EPSILON;
+                }
+
+                Ray refrRay = Ray(minInterPoint, refrDir, r.depth, nextRefr);
+                Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1);
+                //std::cout << refrColor.x << " " << refrColor.y << " " << refrColor.z << std::endl;
+                result += refrColor;
             }
         }
     }
     else
     {
-        result = Vec3();
+        result = Vec3(0,0 ,0.0);
     }
 
     return result;
@@ -252,7 +278,7 @@ int main()
     for (int y = 0; y < SIZE; ++y)
     {
         //std::cout << x << std::endl;
-        #pragma omp parallel for schedule(dynamic, 1)
+        //#pragma omp parallel for schedule(dynamic, 1)
         for (int x = 0; x < SIZE; ++x)
         {
             Vec3 finalColor = Vec3();

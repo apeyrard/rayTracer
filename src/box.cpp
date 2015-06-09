@@ -1,6 +1,7 @@
 #include <box.hpp>
 #include <algorithm>
 #include <iostream>
+#include <cstdlib>
 
 namespace raytracer{
 
@@ -68,7 +69,6 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
         if ((t1 > tnear) or (tnear == -1))
         {
             tnear = t1;
-            minNorm = Vec3(1, 0, 0);
         }
 
         if ((t2 < tfar) or (tfar == -1))
@@ -116,7 +116,6 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
         if ((t1 > tnear) or (tnear == -1))
         {
             tnear = t1;
-            minNorm = Vec3(0, 1, 0);
         }
 
         if ((t2 < tfar) or (tfar == -1))
@@ -165,7 +164,6 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
         if ((t1 > tnear) or (tnear == -1))
         {
             tnear = t1;
-            minNorm = Vec3(0, 0, 1);
         }
 
         if ((t2 < tfar) or (tfar == -1))
@@ -186,15 +184,32 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
         }
     }
 
-    /*if ((ray.origin.x < std::min(x1, x2)) or (ray.origin.x > std::max(x1,x2)) or (ray.origin.y < std::min(y1, y2)) or (ray.origin.y > std::max(y1,y2))
-    or (ray.origin.z < std::min(z1, z2)) or (ray.origin.z > std::max(z1,z2)))
+    double t = tnear;
+    if (tnear < 0)
     {
-        if (ray.direction.dot(minNorm) > 0)
-        {
-            minNorm = minNorm * -1;
-        }
+        t = tfar;
     }
-    else*/
+
+    Vec3 impact = ray.origin + ray.direction * t;
+    //std::cout << "impact at" << impact.x << " " << impact.y << " " << impact.z << " dir is " << ray.direction.x << " " << ray.direction.y << " " << ray.direction.z <<  std::endl;
+
+    if ((abs(impact.x - x1) < 10e-12) or (abs(impact.x - x2) < 10e-12))
+    {
+        //std::cout << "norm is x" << std::endl;
+        minNorm = Vec3(1, 0, 0);
+    }
+    else if ((abs(impact.y - y1) < 10e-12) or (abs(impact.y - y2) < 10e-12))
+    {
+        //std::cout << "norm is y" << std::endl;
+        minNorm = Vec3(0, 1, 0);
+    }
+    else if ((abs(impact.z - z1) < 10e-12) or (abs(impact.z - z2) < 10e-12))
+    {
+        //std::cout << "norm is z" << std::endl;
+        minNorm = Vec3(0, 0, 1);
+    }
+
+
     if (ray.direction.dot(minNorm) > 0)
     {
         minNorm *= -1;
@@ -202,12 +217,7 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
 
     normal = minNorm;
 
-    if (tnear < 0)
-    {
-        return tfar;
-    }
-
-    return tnear;
+    return t;
 }
 
 double Box::getMinPos(const Vec3 axis) const
