@@ -6,8 +6,6 @@
 #include <random>
 #include <cmath>
 
-#include <SFML/Graphics.hpp>
-
 #include <constants.hpp>
 #include <vec3.hpp>
 #include <object.hpp>
@@ -56,11 +54,13 @@ Ray getRefractionRay(Vec3 interPoint, Vec3 normal, double objectRefraction, Ray 
 }
 
 
-Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission)
+Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission, int& contributiveRay)
 {
     //Stop and return black if maxDepth
     if (r.depth >= MAXDEPTH)
     {
+        //std::cout << "depth reached" << std::endl;
+        contributiveRay--;
         return Vec3(0,0,0);
     }
 
@@ -99,6 +99,8 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         Vec3 emittance = prevEmittance * minObj->color;
         if((emittance.x < 0.001)and (emittance.y < 0.001) and (emittance.z < 0.001))
         {
+            //std::cout << "not enough energy" << std::endl;
+            contributiveRay--;
             return Vec3();
         }
 
@@ -113,6 +115,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         if ((minObj->diffuse > 0)or (minObj->spec > 0))
         {
 
+            /*
             //for each light, check if we are in shadow
             for (auto lightIt = lights.begin(); lightIt != lights.end(); ++lightIt)
             {
@@ -161,18 +164,19 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
                         result += minObj->color * (*lightIt)->color * spec;
                     }
                 }
-                if (r.depth < MAXDEPTH)
+            }
+            */
+            if (r.depth < MAXDEPTH)
+            {
+                std::normal_distribution<double> gauss(0,1);
+                Ray randomRay = Ray(minInterPoint, Vec3(gauss(rng), gauss(rng), gauss(rng)), r.depth+1, r.refr);
+                if (randomRay.direction.dot(minNormal) < 0)
                 {
-                    std::normal_distribution<double> gauss(0,1);
-                    Ray randomRay = Ray(minInterPoint, Vec3(gauss(rng), gauss(rng), gauss(rng)), r.depth+1, r.refr);
-                    if (randomRay.direction.dot(minNormal) < 0)
-                    {
-                        randomRay.direction *= -1;
-                    }
-                    double dot = minNormal.dot(randomRay.direction);
-                    double diff = minObj->diffuse * dot;
-                    result += minObj->color * (getColor(objects, randomRay, lights, emittance, 0)) * diff;
+                    randomRay.direction *= -1;
                 }
+                double dot = minNormal.dot(randomRay.direction);
+                double diff = minObj->diffuse * dot;
+                result += minObj->color * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay)) * diff;
             }
 
         }
@@ -185,7 +189,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
             if (r.depth < MAXDEPTH)
             {
                 Ray reflectedRay = getReflectionRay(minInterPoint, minNormal, r);
-                Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1);
+                Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1, contributiveRay);
                 result += reflColor * refl;
             }
         }
@@ -197,7 +201,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
             if (r.depth < MAXDEPTH)
             {
                 Ray refrRay = getRefractionRay(minInterPoint, minNormal, objRefr, r);
-                Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1);
+                Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1, contributiveRay);
                 result += refrColor;
             }
         }
@@ -211,7 +215,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
     //return (minNormal.norm() + Vec3(1, 1, 1)) /2;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 
     std::vector<Object*> listObjects;
@@ -227,8 +231,7 @@ int main()
     double fieldOfView;
 
     loadFromScene(&listObjects,
-        &lights,
-        "../scenes/refraction",
+        &lights, argv[1],
         size,
         samples,
         cameraPos,
@@ -236,11 +239,7 @@ int main()
         cameraUp,
         fieldOfView);
 
-    sf::Texture texture;
-    texture.create(size, size);
-
-    sf::Uint8* pixels = new sf::Uint8[size * size * 4];
-    sf::RenderWindow window(sf::VideoMode(size, size), "Ray Tracer");
+    unsigned char pixels[size * size * 3];
 
     Vec3 cameraRight = cameraDir.cross(cameraUp);
 
@@ -253,6 +252,7 @@ int main()
         #pragma omp parallel for schedule(dynamic, 1)
         for (int x = 0; x < size; ++x)
         {
+            int contributiveRay = samples * samples;
             Vec3 finalColor = Vec3();
             for (int dx = 0; dx < samples; ++dx)
             {
@@ -264,53 +264,41 @@ int main()
                     Vec3 imagePoint = cameraUp * curY + cameraRight * curX + cameraDir * dist + cameraPos;
 
                     Ray r = Ray(cameraPos, imagePoint-cameraPos);
-                    finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1)/(samples*samples);
+                    finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1, contributiveRay);
                 }
             }
-            pixels[x*4 + (size - y - 1)*size*4] = std::min(finalColor.x*255.0, 255.0); //TODO less naive clamp
-            pixels[x*4 + (size - y -1) *size*4 +1] = std::min(finalColor.y*255.0, 255.0);
-            pixels[x*4 + (size - y - 1)*size*4 +2] = std::min(finalColor.z*255.0, 255.0);
-            pixels[x*4 + (size -y -1)*size*4 +3] = 255;
-        }
-        texture.update(pixels);
+            if (contributiveRay != 0)
+            {
+                Vec3 old = finalColor;
+                finalColor /= samples*samples;
+                if ((finalColor.y >0.8) and (finalColor.z >0.8))
+                {
+                    //std::cout << "old " << old.x << " " << old.y << " " << old.z << std::endl;
+                    //std::cout << contributiveRay << std::endl;
+                    //std::cout <<"final " << finalColor.x << " " << finalColor.y << " " << finalColor.z << std::endl;
+                }
+            }
 
-        sf::Event event;
-        while (window.pollEvent(event))
+            pixels[x*3 + (size - y - 1)*size*3] = std::min(finalColor.x*255.0, 255.0); //TODO less naive clamp
+            pixels[x*3 + (size - y -1) *size*3 +1] = std::min(finalColor.y*255.0, 255.0);
+            pixels[x*3 + (size - y - 1)*size*3 +2] = std::min(finalColor.z*255.0, 255.0);
+        }
+        if (y%10 == 0)
         {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window.close();
+            std::cout << y << std::endl;
         }
+    }
 
-        window.clear(sf::Color::Black);
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        window.draw(sprite);
-        window.display();
+    // Write to file
+    FILE *f = fopen("image.ppm", "w");
+    fprintf(f, "P3\n%d %d\n%d\n", size, size, 255);
+    for (int i = 0; i < size*size*3; i+=3)
+    {
+        fprintf(f, "%d %d %d ", pixels[i], pixels[i+1], pixels[i+2]);
     }
 
     std::cout << "done" << std::endl;
-    while (window.isOpen())
-    {
-        // check all the window's events that were triggered since the last iteration of the loop
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
 
-        // clear the window with black color
-        window.clear(sf::Color::Black);
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        window.draw(sprite);
-        window.display();
-    }
-
-    //Cleanup
-    delete pixels;
     for (auto it = listObjects.begin(); it != listObjects.end(); ++it)
     {
         delete(*it);

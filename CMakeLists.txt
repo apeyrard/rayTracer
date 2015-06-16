@@ -57,9 +57,14 @@ if (rayTracer_build_tests)
     add_test(rayTracer-tests ${CMAKE_SOURCE_DIR}/bin/debug/rayTracer_test)
 endif()
 
+LINK_DIRECTORIES(${CMAKE_BINARY_DIR} /libs)
 
-find_package(SFML 2 REQUIRED system window graphics network audio)
-if(SFML_FOUND)
-    include_directories(${SFML_INCLUDE_DIR})
-    target_link_libraries(rayTracer ${SFML_LIBRARIES})
-endif()
+TARGET_LINK_LIBRARIES(rayTracer libgomp.so.1)
+TARGET_LINK_LIBRARIES(rayTracer libstdc++.so.6)
+
+
+#find_package(SFML 2 REQUIRED system window graphics network audio)
+#if(SFML_FOUND)
+#    include_directories(${SFML_INCLUDE_DIR})
+#    target_link_libraries(rayTracer ${SFML_LIBRARIES})
+#endif()
