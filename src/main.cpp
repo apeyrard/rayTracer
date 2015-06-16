@@ -112,7 +112,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         //diff
         if ((minObj->diffuse > 0)or (minObj->spec > 0))
         {
-            //TODO make this faster by getting shadow percentage
+
             //for each light, check if we are in shadow
             for (auto lightIt = lights.begin(); lightIt != lights.end(); ++lightIt)
             {
@@ -120,20 +120,29 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
                 Vec3 randSurfacePoint = (*lightIt)->getRandPoint(rng);
                 //Shoot shadow ray to random point on light surface
                 Ray shadowRay = Ray(minInterPoint, randSurfacePoint - minInterPoint);
-                bool inShadow = false;
+                bool inShadow = true;
+
+                double minShadowDist = -1;
+                Object* minShadowObj = NULL;
                 for(auto objIt = objects.begin(); objIt!=objects.end(); ++objIt)
                 {
-                    if((*objIt) != (*lightIt))
+                    Vec3 tmp = Vec3();
+                    double inter = (*objIt)->intersect(shadowRay, tmp);
+                    if (inter != 0)
                     {
-                        Vec3 tmp = Vec3();
-                        double inter = (*objIt)->intersect(shadowRay, tmp);
-                        if ((inter > 0)and (inter < (randSurfacePoint - minInterPoint).length()))
+                        if ((inter < minShadowDist) or (minShadowDist == -1))
                         {
-                            inShadow = true;
-                            break;
+                            minShadowDist = inter;
+                            minShadowObj = (*objIt);
                         }
                     }
                 }
+
+                if (minShadowObj == (*lightIt))
+                {
+                    inShadow = false;
+                }
+
                 if(!inShadow)
                 {
                     double dot = minNormal.dot(shadowRay.direction);
