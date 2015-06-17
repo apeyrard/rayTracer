@@ -9,6 +9,7 @@
 #include <object.hpp>
 #include <sphere.hpp>
 #include <box.hpp>
+#include <cylinder.hpp>
 
 namespace raytracer
 {
@@ -29,6 +30,50 @@ std::vector<std::string> split(const std::string &s, char delim)
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
+}
+
+void reset(double& refl, double& diff, double& refr, double& spec, double& light, double& radius, double& length, Vec3& pos, Vec3& color, Vec3& dim, Vec3& dir)
+{
+    //reset
+    refl = 0;
+    diff = 0;
+    refr = 0;
+    spec = 0;
+    light = 0;
+    radius = 0;
+    length = 0;
+    pos = Vec3();
+    color = Vec3();
+    dim = Vec3();
+    dir = Vec3();
+}
+
+void addPrevObject(std::string & objectInProgress, double& refl, double& diff, double& refr, double& spec, double& light, double& radius, double& length, Vec3& pos, Vec3& color, Vec3& dim, Vec3& dir, std::vector<Object*>* objects, std::vector<Object*>* lights)
+{
+    Object* obj = NULL;
+    if (objectInProgress == "SPHERE")
+    {
+        obj = new Sphere(pos, radius, color, refl, diff, spec, refr, light);
+    }
+    else if (objectInProgress == "BOX")
+    {
+        obj = new Box(pos, Vec3(), dim, color, refl, diff, spec, refr, light);
+    }
+    else if (objectInProgress == "CYLINDER")
+    {
+        obj = new Cylinder(pos, dir, length, radius, color, refl, diff, spec, refr, light);
+    }
+
+    if (obj != NULL)
+    {
+        objects->push_back(obj);
+        if (light != 0)
+        {
+            lights->push_back(obj);
+        }
+    }
+
+    reset(refl, diff, refr, spec, light, radius, length, pos, color, dim, dir);
 }
 
 void loadFromScene(std::vector<Object *> * objects,
@@ -65,9 +110,12 @@ void loadFromScene(std::vector<Object *> * objects,
         double spec = 0;
         double light = 0;
         double radius = 0;
+        double length = 0;
         Vec3 pos = Vec3();
         Vec3 color = Vec3();
         Vec3 dim = Vec3();
+        Vec3 dir = Vec3();
+
 
 
         // parsing tokens
@@ -121,87 +169,18 @@ void loadFromScene(std::vector<Object *> * objects,
             }
             else if (token == "SPHERE")
             {
-                if (objectInProgress == "SPHERE")
-                {
-                    Object* obj = new Sphere(pos, radius, color, refl, diff, spec, refr, light);
-                    objects->push_back(obj);
-                    if (light != 0)
-                    {
-                        lights->push_back(obj);
-                    }
-                    //reset
-                    refl = 0;
-                    diff = 0;
-                    refr = 0;
-                    spec = 0;
-                    light = 0;
-                    radius = 0;
-                    pos = Vec3();
-                    color = Vec3();
-                    dim = Vec3();
-                }
-                else if (objectInProgress == "BOX")
-                {
-                    Object* obj = new Box(pos, Vec3(), dim, color, refl, diff, spec, refr, light);
-                    objects->push_back(obj);
-                    if (light != 0)
-                    {
-                        lights->push_back(obj);
-                    }
-                    //reset
-                    refl = 0;
-                    diff = 0;
-                    refr = 0;
-                    spec = 0;
-                    light = 0;
-                    radius = 0;
-                    pos = Vec3();
-                    color = Vec3();
-                    dim = Vec3();
-                }
+                addPrevObject(objectInProgress, refl, diff, refr, spec, light, radius, length, pos, color, dim, dir, objects, lights);
                 objectInProgress = "SPHERE";
             }
             else if (token == "BOX")
             {
-                if (objectInProgress == "SPHERE")
-                {
-                    Object* obj = new Sphere(pos, radius, color, refl, diff, spec, refr, light);
-                    objects->push_back(obj);
-                    if (light != 0)
-                    {
-                        lights->push_back(obj);
-                    }
-                    //reset
-                    refl = 0;
-                    diff = 0;
-                    refr = 0;
-                    spec = 0;
-                    light = 0;
-                    radius = 0;
-                    pos = Vec3();
-                    color = Vec3();
-                    dim = Vec3();
-                }
-                else if (objectInProgress == "BOX")
-                {
-                    Object* obj = new Box(pos, Vec3(), dim, color, refl, diff, spec, refr, light);
-                    objects->push_back(obj);
-                    if (light != 0)
-                    {
-                        lights->push_back(obj);
-                    }
-                    //reset
-                    refl = 0;
-                    diff = 0;
-                    refr = 0;
-                    spec = 0;
-                    light = 0;
-                    radius = 0;
-                    pos = Vec3();
-                    color = Vec3();
-                    dim = Vec3();
-                }
+                addPrevObject(objectInProgress, refl, diff, refr, spec, light, radius, length, pos, color, dim, dir, objects, lights);
                 objectInProgress = "BOX";
+            }
+            else if (token == "CYLINDER")
+            {
+                addPrevObject(objectInProgress, refl, diff, refr, spec, light, radius,length, pos, color, dim, dir, objects, lights);
+                objectInProgress = "CYLINDER";
             }
             else if (token == "POS")
             {
@@ -221,10 +200,24 @@ void loadFromScene(std::vector<Object *> * objects,
                 ++it;
                 dim.z = std::stod(*it);
             }
+            else if (token == "DIR")
+            {
+                ++it;
+                dir.x = std::stod(*it);
+                ++it;
+                dir.y = std::stod(*it);
+                ++it;
+                dir.z = std::stod(*it);
+            }
             else if (token == "RADIUS")
             {
                 ++it;
                 radius = std::stod(*it);
+            }
+            else if (token == "LENGTH")
+            {
+                ++it;
+                length = std::stod(*it);
             }
             else if (token == "COLOR")
             {
@@ -262,44 +255,7 @@ void loadFromScene(std::vector<Object *> * objects,
             }
         }
         // Add the last one
-        if (objectInProgress == "SPHERE")
-        {
-            Object* obj = new Sphere(pos, radius, color, refl, diff, spec, refr, light);
-            objects->push_back(obj);
-            if (light != 0)
-            {
-                lights->push_back(obj);
-            }
-            //reset
-            refl = 0;
-            diff = 0;
-            refr = 0;
-            spec = 0;
-            light = 0;
-            radius = 0;
-            pos = Vec3();
-            color = Vec3();
-            dim = Vec3();
-        }
-        else if (objectInProgress == "BOX")
-        {
-            Object* obj = new Box(pos, Vec3(), dim, color, refl, diff, spec, refr, light);
-            objects->push_back(obj);
-            if (light != 0)
-            {
-                lights->push_back(obj);
-            }
-            //reset
-            refl = 0;
-            diff = 0;
-            refr = 0;
-            spec = 0;
-            light = 0;
-            radius = 0;
-            pos = Vec3();
-            color = Vec3();
-            dim = Vec3();
-        }
+        addPrevObject(objectInProgress, refl, diff, refr, spec, light, radius,length, pos, color, dim, dir, objects, lights);
     }
     else
     {

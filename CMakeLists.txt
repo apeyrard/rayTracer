@@ -6,6 +6,8 @@ option(rayTracer_build_tests "Build unit tests" ON)
 
 set (CMAKE_BUILD_TYPE debug)
 
+set(CMAKE_CXX_COMPILER /usr/bin/g++-4.7)
+
 set (RAYTRACER_VERSION_MAJOR 0)
 set (RAYTRACER_VERSION_MINOR 1)
 set (RAYTRACER_VERSION_PATCH 0)
@@ -34,7 +36,8 @@ set (RAYTRACER_SOURCES
     ${RAYTRACER_SOURCE_DIR}/ray.cpp
     ${RAYTRACER_SOURCE_DIR}/object.cpp
     ${RAYTRACER_SOURCE_DIR}/sphere.cpp
-    #${RAYTRACER_SOURCE_DIR}/plane.cpp
+    ${RAYTRACER_SOURCE_DIR}/cylinder.cpp
+    ${RAYTRACER_SOURCE_DIR}/plane.cpp
     ${RAYTRACER_SOURCE_DIR}/box.cpp
     ${RAYTRACER_SOURCE_DIR}/main.cpp
 )
@@ -56,12 +59,6 @@ if (rayTracer_build_tests)
     target_link_libraries(rayTracer_test ${GTEST_BOTH_LIBRARIES} raytracer)
     add_test(rayTracer-tests ${CMAKE_SOURCE_DIR}/bin/debug/rayTracer_test)
 endif()
-
-LINK_DIRECTORIES(${CMAKE_BINARY_DIR} /libs)
-
-TARGET_LINK_LIBRARIES(rayTracer libgomp.so.1)
-TARGET_LINK_LIBRARIES(rayTracer libstdc++.so.6)
-
 
 #find_package(SFML 2 REQUIRED system window graphics network audio)
 #if(SFML_FOUND)

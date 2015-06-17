@@ -54,18 +54,16 @@ Ray getRefractionRay(Vec3 interPoint, Vec3 normal, double objectRefraction, Ray 
 }
 
 
-Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission, int& contributiveRay)
+Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission, int& contributiveRay, std::default_random_engine &rng, std::normal_distribution<double> &gauss)
 {
     //Stop and return black if maxDepth
     if (r.depth >= MAXDEPTH)
     {
         //std::cout << "depth reached" << std::endl;
-        contributiveRay--;
+        //contributiveRay--;
         return Vec3(0,0,0);
     }
 
-    std::random_device rd;
-    std::default_random_engine rng(rd());
     Vec3 result = Vec3();
     double minDist = -1;
     Object* minObj = NULL;
@@ -91,6 +89,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         }
     }
 
+    //return (minNormal.norm() + Vec3(1, 1, 1)) /2;
 
     //Now computing color
     if (minObj != NULL)
@@ -100,7 +99,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         if((emittance.x < 0.001)and (emittance.y < 0.001) and (emittance.z < 0.001))
         {
             //std::cout << "not enough energy" << std::endl;
-            contributiveRay--;
+            //contributiveRay--;
             return Vec3();
         }
 
@@ -112,73 +111,29 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         }
 
         //diff
-        if ((minObj->diffuse > 0)or (minObj->spec > 0))
+        if (minObj->diffuse > 0)
         {
 
-            /*
-            //for each light, check if we are in shadow
-            for (auto lightIt = lights.begin(); lightIt != lights.end(); ++lightIt)
+            Ray randomRay = Ray(minInterPoint, Vec3(gauss(rng), gauss(rng), gauss(rng)), r.depth+1, r.refr);
+            if (randomRay.direction.dot(minNormal) < 0)
             {
-                //Get random point on surface of light
-                Vec3 randSurfacePoint = (*lightIt)->getRandPoint(rng);
-                //Shoot shadow ray to random point on light surface
-                Ray shadowRay = Ray(minInterPoint, randSurfacePoint - minInterPoint);
-                bool inShadow = true;
-
-                double minShadowDist = -1;
-                Object* minShadowObj = NULL;
-                for(auto objIt = objects.begin(); objIt!=objects.end(); ++objIt)
-                {
-                    Vec3 tmp = Vec3();
-                    double inter = (*objIt)->intersect(shadowRay, tmp);
-                    if (inter != 0)
-                    {
-                        if ((inter < minShadowDist) or (minShadowDist == -1))
-                        {
-                            minShadowDist = inter;
-                            minShadowObj = (*objIt);
-                        }
-                    }
-                }
-
-                if (minShadowObj == (*lightIt))
-                {
-                    inShadow = false;
-                }
-
-                if(!inShadow)
-                {
-                    double dot = minNormal.dot(shadowRay.direction);
-                    if (dot > 0)
-                    {
-                        double diff = dot * minObj->diffuse;
-                        result += minObj->color * (*lightIt)->color * diff;
-                    }
-
-                    // add spec lighting
-                    Vec3 reflDir = shadowRay.direction - minNormal * (shadowRay.direction.dot(minNormal) *2);
-                    dot = r.direction.dot(reflDir);
-                    if (dot > 0)
-                    {
-                        double spec = pow(dot, 50) * minObj->spec;
-                        result += minObj->color * (*lightIt)->color * spec;
-                    }
-                }
+                randomRay.direction *= -1;
             }
-            */
-            if (r.depth < MAXDEPTH)
+            double dot = minNormal.dot(randomRay.direction);
+            double diff = minObj->diffuse * dot;
+            result += minObj->color * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay, rng, gauss)) * diff;
+
+            /*//Spec (Phong)
+            if (minObj->spec > 0)
             {
-                std::normal_distribution<double> gauss(0,1);
-                Ray randomRay = Ray(minInterPoint, Vec3(gauss(rng), gauss(rng), gauss(rng)), r.depth+1, r.refr);
-                if (randomRay.direction.dot(minNormal) < 0)
+                Vec3 reflDir = randomRay.direction - minNormal * (randomRay.direction.dot(minNormal) *2);
+                dot = r.direction.dot(reflDir);
+                if (dot > 0)
                 {
-                    randomRay.direction *= -1;
+                    double spec = pow(dot, 50) * minObj->spec;
+                    result += minObj->color * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay, rng, gauss)) * spec;
                 }
-                double dot = minNormal.dot(randomRay.direction);
-                double diff = minObj->diffuse * dot;
-                result += minObj->color * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay)) * diff;
-            }
-
+            }*/
         }
 
 
@@ -186,24 +141,18 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         double refl = minObj->reflection;
         if (refl > 0.0)
         {
-            if (r.depth < MAXDEPTH)
-            {
-                Ray reflectedRay = getReflectionRay(minInterPoint, minNormal, r);
-                Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1, contributiveRay);
-                result += reflColor * refl;
-            }
+            Ray reflectedRay = getReflectionRay(minInterPoint, minNormal, r);
+            Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1, contributiveRay, rng, gauss);
+            result += reflColor * refl;
         }
 
         // Get refraction
         double objRefr = minObj->refr;
         if (objRefr > 0.0)
         {
-            if (r.depth < MAXDEPTH)
-            {
-                Ray refrRay = getRefractionRay(minInterPoint, minNormal, objRefr, r);
-                Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1, contributiveRay);
-                result += refrColor;
-            }
+            Ray refrRay = getRefractionRay(minInterPoint, minNormal, objRefr, r);
+            Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1, contributiveRay, rng, gauss);
+            result += refrColor;
         }
     }
     else
@@ -245,13 +194,15 @@ int main(int argc, char* argv[])
 
     // Making sure camera Dir and Up that were defined are 90°
     cameraUp = cameraRight.cross(cameraDir);
-
     for (int y = 0; y < size; ++y)
     {
         //std::cout << x << std::endl;
         #pragma omp parallel for schedule(dynamic, 1)
         for (int x = 0; x < size; ++x)
         {
+            std::default_random_engine rng(x+y*size);
+            std::normal_distribution<double> gauss(0,1);
+
             int contributiveRay = samples * samples;
             Vec3 finalColor = Vec3();
             for (int dx = 0; dx < samples; ++dx)
@@ -261,22 +212,24 @@ int main(int argc, char* argv[])
                     double dist = size / fieldOfView;
                     double curX = double(x) + dx/samples - size/2;
                     double curY = double(y) + dy/samples - size/2;
+                    //std::random_device rd;
+
                     Vec3 imagePoint = cameraUp * curY + cameraRight * curX + cameraDir * dist + cameraPos;
 
                     Ray r = Ray(cameraPos, imagePoint-cameraPos);
-                    finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1, contributiveRay);
+                    finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1, contributiveRay, rng, gauss);
                 }
             }
             if (contributiveRay != 0)
             {
                 Vec3 old = finalColor;
-                finalColor /= samples*samples;
-                if ((finalColor.y >0.8) and (finalColor.z >0.8))
+                finalColor /= contributiveRay;
+                /*if ((finalColor.y >0.8) and (finalColor.z >0.8))
                 {
                     //std::cout << "old " << old.x << " " << old.y << " " << old.z << std::endl;
                     //std::cout << contributiveRay << std::endl;
                     //std::cout <<"final " << finalColor.x << " " << finalColor.y << " " << finalColor.z << std::endl;
-                }
+                }*/
             }
 
             pixels[x*3 + (size - y - 1)*size*3] = std::min(finalColor.x*255.0, 255.0); //TODO less naive clamp

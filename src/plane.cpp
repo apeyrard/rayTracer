@@ -13,8 +13,8 @@ Plane::Plane(Vec3 normal, double dist, Vec3 color, double reflection, double dif
 double Plane::intersect(const Ray& ray, Vec3& normal) const
 {
     //std::cout << "inter plane" << std::endl;
-    //std::cout << ray.direction.z << std::endl;
-    //std::cout << pos.z << std::endl;
+    //std::cout << ray.direction.x << " " << ray.direction.y << " " << ray.direction.z << std::endl;
+    //std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
     double Vd = pos.dot(ray.direction);
     //std::cout << Vd << std::endl;
     if (Vd == 0)
@@ -56,35 +56,12 @@ Vec3 Plane::getRandPoint(std::default_random_engine &rng) const
 
 double Plane::getMinPos(const Vec3 axis) const
 {
-    if(axis.x != 0)
-    {
-        return pos.x - dimensions.x;
-    }
-    else if(axis.y != 0)
-    {
-        return pos.y - dimensions.y;
-    }
-    else if(axis.z != 0)
-    {
-        return pos.z - dimensions.z;
-    }
+    return 0;
 }
 
 double Plane::getMaxPos(const Vec3 axis) const
 {
-    if(axis.x != 0)
-    {
-        return pos.x + dimensions.x;
-    }
-    else if(axis.y != 0)
-    {
-        return pos.y + dimensions.y;
-    }
-    else if(axis.z != 0)
-    {
-        return pos.z + dimensions.z;
-    }
-
+    return 0;
 }
 
 }
