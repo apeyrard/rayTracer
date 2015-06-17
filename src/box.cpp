@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 
 namespace raytracer{
 
@@ -192,18 +193,20 @@ double Box::intersect(const Ray& ray, Vec3& normal) const
 
     Vec3 impact = ray.origin + ray.direction * t;
     //std::cout << "impact at" << impact.x << " " << impact.y << " " << impact.z << " dir is " << ray.direction.x << " " << ray.direction.y << " " << ray.direction.z <<  std::endl;
-
-    if ((abs(impact.x - x1) < 10e-12) or (abs(impact.x - x2) < 10e-12))
+    //std::cout << impact.x - x1 << " " << impact.x - x2 << std::endl;
+    //std::cout << impact.y - y1 << " " << impact.y - y2 << std::endl;
+    //std::cout << impact.z - z1 << " " << impact.z - z2 << std::endl;
+    if ((std::abs(impact.x - x1) < 1e-12) or (std::abs(impact.x - x2) < 1e-12))
     {
         //std::cout << "norm is x" << std::endl;
         minNorm = Vec3(1, 0, 0);
     }
-    else if ((abs(impact.y - y1) < 10e-12) or (abs(impact.y - y2) < 10e-12))
+    else if ((std::abs(impact.y - y1) < 1e-12) or (std::abs(impact.y - y2) < 1e-12))
     {
         //std::cout << "norm is y" << std::endl;
         minNorm = Vec3(0, 1, 0);
     }
-    else if ((abs(impact.z - z1) < 10e-12) or (abs(impact.z - z2) < 10e-12))
+    else if ((std::abs(impact.z - z1) < 1e-12) or (std::abs(impact.z - z2) < 1e-12))
     {
         //std::cout << "norm is z" << std::endl;
         minNorm = Vec3(0, 0, 1);

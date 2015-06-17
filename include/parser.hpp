@@ -84,7 +84,8 @@ void loadFromScene(std::vector<Object *> * objects,
     Vec3 &camera_origin,
     Vec3 &camera_direction,
     Vec3 &camera_up,
-    double &field_of_view
+    double &field_of_view,
+    Vec3 &ambient
     )
 {
     std::ifstream inputFile(fileName);
@@ -115,6 +116,7 @@ void loadFromScene(std::vector<Object *> * objects,
         Vec3 color = Vec3();
         Vec3 dim = Vec3();
         Vec3 dir = Vec3();
+        ambient = Vec3();
 
 
 
@@ -227,6 +229,15 @@ void loadFromScene(std::vector<Object *> * objects,
                 color.y = std::stod(*it);
                 ++it;
                 color.z = std::stod(*it);
+            }
+            else if (token == "AMBIENT")
+            {
+                ++it;
+                ambient.x = std::stod(*it);
+                ++it;
+                ambient.y = std::stod(*it);
+                ++it;
+                ambient.z = std::stod(*it);
             }
             else if (token == "REFL")
             {

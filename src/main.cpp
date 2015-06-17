@@ -54,13 +54,13 @@ Ray getRefractionRay(Vec3 interPoint, Vec3 normal, double objectRefraction, Ray 
 }
 
 
-Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission, int& contributiveRay, std::default_random_engine &rng, std::normal_distribution<double> &gauss)
+Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, Vec3 prevEmittance, int emission, int& contributiveRay, std::default_random_engine &rng, std::normal_distribution<double> &gauss, Vec3 ambient)
 {
     //Stop and return black if maxDepth
     if (r.depth >= MAXDEPTH)
     {
         //std::cout << "depth reached" << std::endl;
-        //contributiveRay--;
+        contributiveRay--;
         return Vec3(0,0,0);
     }
 
@@ -99,8 +99,8 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         if((emittance.x < 0.001)and (emittance.y < 0.001) and (emittance.z < 0.001))
         {
             //std::cout << "not enough energy" << std::endl;
-            //contributiveRay--;
-            return Vec3();
+            contributiveRay--;
+            return Vec3(0, 0, 0);
         }
 
         //If a light is hit, we got lighting
@@ -121,7 +121,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
             }
             double dot = minNormal.dot(randomRay.direction);
             double diff = minObj->diffuse * dot;
-            result += emittance * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay, rng, gauss)) * diff;
+            result += emittance * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay, rng, gauss, ambient)) * diff;
 
             /*//Spec (Phong)
             if (minObj->spec > 0)
@@ -142,7 +142,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         if (refl > 0.0)
         {
             Ray reflectedRay = getReflectionRay(minInterPoint, minNormal, r);
-            Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1, contributiveRay, rng, gauss);
+            Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1, contributiveRay, rng, gauss, ambient);
             result += emittance * reflColor * refl;
         }
 
@@ -151,13 +151,13 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         if (objRefr > 0.0)
         {
             Ray refrRay = getRefractionRay(minInterPoint, minNormal, objRefr, r);
-            Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1, contributiveRay, rng, gauss);
+            Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1, contributiveRay, rng, gauss, ambient);
             result += emittance * refrColor;
         }
     }
     else
     {
-        result = Vec3(0,0,0.0);
+        result = ambient;
     }
 
     return result;
@@ -179,6 +179,8 @@ int main(int argc, char* argv[])
     Vec3 cameraUp;
     double fieldOfView;
 
+    Vec3 ambient;
+
     loadFromScene(&listObjects,
         &lights, argv[1],
         size,
@@ -186,7 +188,8 @@ int main(int argc, char* argv[])
         cameraPos,
         cameraDir,
         cameraUp,
-        fieldOfView);
+        fieldOfView,
+        ambient);
 
     unsigned char pixels[size * size * 3];
 
@@ -217,7 +220,7 @@ int main(int argc, char* argv[])
                     Vec3 imagePoint = cameraUp * curY + cameraRight * curX + cameraDir * dist + cameraPos;
 
                     Ray r = Ray(cameraPos, imagePoint-cameraPos);
-                    finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1, contributiveRay, rng, gauss);
+                    finalColor += getColor(listObjects, r, lights, Vec3(1, 1, 1), 1, contributiveRay, rng, gauss, ambient);
                 }
             }
             if (contributiveRay != 0)

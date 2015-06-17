@@ -10,8 +10,8 @@ Cylinder::Cylinder(Vec3 pos, Vec3 dir, double length, double radius, Vec3 color,
     , length(length)
 {
     direction = dir.norm();
-    bottom = new Plane(direction, -direction.dot(pos) + length/2, color, reflection, diffuse, spec, light);
-    top = new Plane(direction, -direction.dot(pos) - length/2, color, reflection, diffuse, spec, light);
+    bottom = new Plane(direction, -direction.dot(pos) + length/2.0, color, reflection, diffuse, spec, light);
+    top = new Plane(direction, -direction.dot(pos) - length/2.0, color, reflection, diffuse, spec, light);
 }
 
 Cylinder::~Cylinder()
@@ -27,13 +27,13 @@ double Cylinder::intersect(const Ray& ray, Vec3& normal) const
 
     //std::cout << pos.x << " " << pos.y << " " << pos.z << std::endl;
     Vec3 deltaPos = ray.origin - pos;
-    double B = 2*( (ray.direction - direction * (ray.direction.dot(direction))).dot(deltaPos - direction * (deltaPos.dot(direction))));
+    double B = 2.0*( (ray.direction - direction * (ray.direction.dot(direction))).dot(deltaPos - direction * (deltaPos.dot(direction))));
 
     Vec3 c = (deltaPos - direction*(deltaPos.dot(direction)));
     double C = c.dot(c) - pow(radius, 2);
 
     // Now solving At**2 +Bt +C = 0
-    double delta = pow(B, 2) - 4*A*C;
+    double delta = pow(B, 2) - 4.0*A*C;
 
     //t0 and t1 intersection with cylinder
     double t0 = 0;
@@ -47,14 +47,14 @@ double Cylinder::intersect(const Ray& ray, Vec3& normal) const
     {
         // if negative discriminant, no solution to the equation, no intersection
 
-        t0 = (-B - sqrt(delta))/(2*A);
+        t0 = (-B - sqrt(delta))/(2.0*A);
         if (t0 > 0)
         {
             //closest intersection is t0
             normal = Vec3(0, 1, 0);
         }
 
-        t1 = (-B + sqrt(delta))/(2*A);
+        t1 = (-B + sqrt(delta))/(2.0*A);
         if (t1 > 0)
         {
             //closest intersection is t1
@@ -64,8 +64,8 @@ double Cylinder::intersect(const Ray& ray, Vec3& normal) const
     }
 
     // useful for verifications
-    Vec3 bottomCenter = pos - direction * length/2;
-    Vec3 topCenter = pos + direction * length/2;
+    Vec3 bottomCenter = pos - direction * length/2.0;
+    Vec3 topCenter = pos + direction * length/2.0;
 
     // verifying t0 and t1
     Vec3 t0InterPoint = ray.origin + ray.direction * t0;
@@ -74,13 +74,13 @@ double Cylinder::intersect(const Ray& ray, Vec3& normal) const
     Vec3 t0norm = t0InterPoint - (pos + direction * (t0InterPoint - pos).dot(direction));
     Vec3 t1norm = t1InterPoint - (pos + direction * (t1InterPoint - pos).dot(direction));
 
-    if (abs((t0InterPoint - pos).dot(direction)) > length/2)
+    if (std::abs((t0InterPoint - pos).dot(direction)) > length/2.0)
     {
 
         t0 = 0;
     }
 
-    if (abs((t1InterPoint - pos).dot(direction)) > length/2)
+    if (std::abs((t1InterPoint - pos).dot(direction)) > length/2.0)
     {
         t1 = 0;
     }
@@ -130,6 +130,12 @@ double Cylinder::intersect(const Ray& ray, Vec3& normal) const
         normal = bottomNormal.norm();
         tmin = t3;
     }
+
+    if (ray.direction.dot(normal) > 0)
+    {
+        normal *= -1;
+    }
+
     return tmin;
 }
 
