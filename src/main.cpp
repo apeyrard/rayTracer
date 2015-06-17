@@ -121,7 +121,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
             }
             double dot = minNormal.dot(randomRay.direction);
             double diff = minObj->diffuse * dot;
-            result += minObj->color * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay, rng, gauss)) * diff;
+            result += emittance * (getColor(objects, randomRay, lights, emittance, 1, contributiveRay, rng, gauss)) * diff;
 
             /*//Spec (Phong)
             if (minObj->spec > 0)
@@ -143,7 +143,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         {
             Ray reflectedRay = getReflectionRay(minInterPoint, minNormal, r);
             Vec3 reflColor = getColor(objects, reflectedRay, lights, emittance, 1, contributiveRay, rng, gauss);
-            result += reflColor * refl;
+            result += emittance * reflColor * refl;
         }
 
         // Get refraction
@@ -152,7 +152,7 @@ Vec3 getColor(std::vector<Object*> objects, Ray r, std::vector<Object*> lights, 
         {
             Ray refrRay = getRefractionRay(minInterPoint, minNormal, objRefr, r);
             Vec3 refrColor = getColor(objects, refrRay, lights, emittance, 1, contributiveRay, rng, gauss);
-            result += refrColor;
+            result += emittance * refrColor;
         }
     }
     else
